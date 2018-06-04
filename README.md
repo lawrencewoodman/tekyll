@@ -26,4 +26,4 @@ Licence
 -------
 Copyright (C) 2018 Lawrence Woodman <lwoodman@vlifesystems.com>
 
-This software is licensed under an MIT Licence.  Please see the file, [LICENSE.md](https://github.com/lawrencewoodman/tekyll/blob/master/LICENSE.md), for details.
+This software is licensed under an MIT Licence.  Please see the file, [LICENCE.md](https://github.com/lawrencewoodman/tekyll/blob/master/LICENCE.md), for details.
