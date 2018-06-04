@@ -13,6 +13,8 @@ source [file join $LibDir parsers.tcl]
 set vars [dict create \
   config [dict create \
     destination [file normalize site] \
+    content [file normalize content] \
+    scripts [file normalize scripts] \
     root [file normalize [pwd]] \
   ] \
   site [dict create \
@@ -27,12 +29,11 @@ set vars [dict create \
 # so you could have: http://example.com/myuser/blog/...
 # which would be [dict get $siteVars url][dict get $siteVars baseurl]/blog
 
-set contentWalker [::fileutil::traverse %AUTO% content]
+set contentWalker [::fileutil::traverse %AUTO% [dict get $vars config scripts]]
 
 $contentWalker foreach file {
-  if {[file tail $file] eq "_map"} {
-    set dir [file dirname $file]
-    puts "Processing: $dir"
-    ::site::mapper process $dir $vars
+  if {[file isfile $file]} {
+    puts "Processing: $file"
+    ::site::mapper process $file $vars
   }
 }

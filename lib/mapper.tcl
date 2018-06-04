@@ -13,15 +13,15 @@ namespace eval ::site {
     variable collections [dict create]
   }
 
-  proc mapper::process {dir vars} {
+  proc mapper::process {file vars} {
     variable collections
     try {
       set cmds [::site::cmds::new map $vars]
       dict set cmds collect [namespace which CmdCollect]
-      load $dir $cmds $vars
+      load $file $cmds $vars
       #ProcessFile $map $dir $vars
     } on error {result options} {
-      return -code error "error processing: $dir, $result"
+      return -code error "error processing: $file, $result"
     }
   }
 
@@ -30,12 +30,10 @@ namespace eval ::site {
     dict lappend collections $collection $vars
   }
 
-  proc mapper::load {dir cmds vars} {
-    set startDir [pwd]
+  proc mapper::load {file cmds vars} {
     set safeInterp [interp create -safe]
     try {
-      cd $dir
-      set fp [open "_map" r]
+      set fp [open $file r]
       set map [read $fp]
       close $fp
 
@@ -49,10 +47,9 @@ namespace eval ::site {
       #}
       return [$safeInterp eval $map]
     } on error {result options} {
-      return -code error "error loading _map in: $dir, $result"
+      return -code error $result
     } finally {
       interp delete $safeInterp
-      cd $startDir
     }
   }
 
