@@ -201,7 +201,6 @@ namespace eval ::site {
         "write: wrong number of arguments\n[::cmdline::usage $options $usage]"
     }
 
-    puts "parsed: $parsed"
     dict for {optionName optionValue} $parsed {
       switch $optionName {
         "binary" {
@@ -233,7 +232,6 @@ namespace eval ::site {
         "write: wrong number of arguments\n[::cmdline::usage $options $usage]"
     }
 
-puts "parsed: $parsed"
     dict for {optionName optionValue} $parsed {
       switch $optionName {
         "binary" {
