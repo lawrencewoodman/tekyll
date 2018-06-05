@@ -189,6 +189,15 @@ namespace eval ::site {
     return ""
   }
 
+  proc cmds::CmdGetParams {vars int args} {
+    # TODO: only allow file and site vars
+    if {[dict exists $vars params {*}$args]} {
+      return [dict get $vars params {*}$args]
+    }
+    # TODO: Is this default a good idea
+    return ""
+  }
+
   proc cmds::CmdRead {int args} {
     # TODO: Only allow to read from content directory or base off config>root
     set options {
