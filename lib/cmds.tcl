@@ -21,12 +21,12 @@ namespace eval ::site {
       markdownify [namespace which CmdMarkdownify] \
       ornament [list [namespace which CmdOrnament] $vars] \
       plugin [list [namespace which CmdPlugin] $vars]\
+      read [namespace which CmdRead] \
       strip_html [namespace which CmdStripHTML] \
     ]
     set additionalMapCmds [dict create \
       file [list [namespace which CmdFile] $vars] \
       glob [namespace which CmdGlob] \
-      read [namespace which CmdRead] \
       write [list [namespace which CmdWrite] $vars] \
     ]
     switch $mode {
@@ -202,13 +202,14 @@ namespace eval ::site {
     # TODO: Only allow to read from content directory or base off config>root
     set options {
       {binary {Whether to use binary translation}}
+      {directory.arg {} {Which directory the file is located in}}
     }
-    set usage ": read \[options] filename content\noptions:"
+    set usage ": read \[options] filename\noptions:"
     set parsed [::cmdline::getoptions args $options $usage]
 
     if {[llength $args] != 1} {
       return -code error \
-        "write: wrong number of arguments\n[::cmdline::usage $options $usage]"
+        "read: wrong number of arguments\n[::cmdline::usage $options $usage]"
     }
 
     dict for {optionName optionValue} $parsed {
@@ -216,10 +217,16 @@ namespace eval ::site {
         "binary" {
           set binary true
         }
+        "directory" {
+          set directory $optionValue
+        }
       }
     }
 
-    set filename [lindex $args 0]
+    # TODO: Ensure directory is based off of root or pwd
+    # TODO: Ensure that can't use .. to get to lower than root
+
+    set filename [file join [pwd] $directory [lindex $args 0]]
     set fp [open $filename r]
     if {$binary} {
       fconfigure $fp -translation binary
@@ -255,7 +262,6 @@ namespace eval ::site {
       [dict get $vars site baseurl] \
       [lindex $args 0] \
     ]
-    puts "write: filename: $filename"
     set content [lindex $args 1]
 
     # TODO: Only allow to write to destination directory
