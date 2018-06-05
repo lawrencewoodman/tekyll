@@ -15,10 +15,11 @@ namespace eval ::site {
     set cmds [dict create \
       collection [namespace which CmdCollection] \
       getvar [list [namespace which CmdGetVar] $vars] \
+      getparams [list [namespace which CmdGetParams] $vars] \
       include [list [namespace which CmdInclude] $vars] \
       log [namespace which CmdLog] \
       markdownify [namespace which CmdMarkdownify] \
-      ornament [namespace which CmdOrnament] \
+      ornament [list [namespace which CmdOrnament] $vars] \
       plugin [list [namespace which CmdPlugin] $vars]\
       strip_html [namespace which CmdStripHTML] \
     ]
@@ -172,8 +173,8 @@ namespace eval ::site {
     return [::Markdown::convert $text]
   }
 
-  # TODO: pass config & site? vars separtely before int arg
-  proc cmds::CmdOrnament {int template vars} {
+  proc cmds::CmdOrnament {vars int template {parameterVars {}}} {
+    dict set vars params $parameterVars
     set script [ornament compile $template]
     set cmds [::site::cmds::new ornament $vars]
     return [ornament run $script $cmds]
