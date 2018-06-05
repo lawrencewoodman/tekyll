@@ -13,7 +13,8 @@ source [file join $LibDir parsers.tcl]
 set vars [dict create \
   config [dict create \
     destination [file normalize site] \
-    content [file normalize content] \
+    content content \
+    includes includes \
     scripts [file normalize scripts] \
     root [file normalize [pwd]] \
   ] \
