@@ -34,7 +34,12 @@ set contentWalker [::fileutil::traverse %AUTO% [dict get $vars config scripts]]
 
 $contentWalker foreach file {
   if {[file isfile $file]} {
-    puts "Processing: $file"
-    ::site::mapper process $file $vars
+    lappend files $file
   }
+}
+
+set files [lsort $files]
+foreach file $files {
+  puts "Processing: $file"
+  ::site::mapper process $file $vars
 }
