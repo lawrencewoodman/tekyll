@@ -20,6 +20,7 @@ set vars [dict create \
   ] \
   site [dict create \
     title "The site's title" \
+    subtitle "The site's subtitle" \
     description "The site's description" \
     url "http://example.com" \
     baseurl "" \
