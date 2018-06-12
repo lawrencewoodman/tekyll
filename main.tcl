@@ -16,9 +16,9 @@ close $fp
 
 # baseurl could by someting like: /myuser
 # so you could have: http://example.com/myuser/blog/...
-# which would be [dict get $siteVars url][dict get $siteVars baseurl]/blog
+# which would be [dict get $vars site url][dict get $vars site baseurl]/blog
 
-set contentWalker [::fileutil::traverse %AUTO% [dict get $vars config scripts]]
+set contentWalker [::fileutil::traverse %AUTO% [dict get $vars build scripts]]
 
 $contentWalker foreach file {
   if {[file isfile $file]} {

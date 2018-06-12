@@ -67,7 +67,7 @@ namespace eval ::site {
   proc cmds::SafeCopy {vars args} {
     try {
       set target [makeFinalPath \
-        [dict get $vars config destination] \
+        [dict get $vars build destination] \
         [dict get $vars site baseurl] \
         [lindex $args end] \
       ]
@@ -140,7 +140,7 @@ namespace eval ::site {
   }
 
   proc cmds::CmdMarkdownify {vars int text} {
-    set cmd [dict get $vars config markdown cmd]
+    set cmd [dict get $vars build markdown cmd]
     try {
       return [exec -- $cmd << $text]
     } on error {result} {
@@ -234,7 +234,7 @@ namespace eval ::site {
     }
 
     set filename [makeFinalPath \
-      [dict get $vars config destination] \
+      [dict get $vars build destination] \
       [dict get $vars site baseurl] \
       [lindex $args 0] \
     ]
