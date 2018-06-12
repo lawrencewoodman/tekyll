@@ -16,6 +16,9 @@ set vars [dict create \
     includes includes \
     scripts [file normalize scripts] \
     root [file normalize [pwd]] \
+    markdown {
+      cmd cmark-gfm
+    } \
   ] \
   site [dict create \
     title "The site's title" \

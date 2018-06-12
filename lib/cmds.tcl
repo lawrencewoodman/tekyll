@@ -17,7 +17,7 @@ namespace eval ::site {
       getvar [list [namespace which CmdGetVar] $vars] \
       getparams [list [namespace which CmdGetParams] $vars] \
       log [namespace which CmdLog] \
-      markdownify [namespace which CmdMarkdownify] \
+      markdownify [list [namespace which CmdMarkdownify] $vars] \
       ornament [list [namespace which CmdOrnament] $vars] \
       plugin [list [namespace which CmdPlugin] $vars]\
       read [namespace which CmdRead] \
@@ -126,8 +126,14 @@ namespace eval ::site {
     return $text
   }
 
-  proc cmds::CmdMarkdownify {int text} {
-    return [::Markdown::convert $text]
+  proc cmds::CmdMarkdownify {vars int text} {
+    set cmd [dict get $vars config markdown cmd]
+    try {
+      return [exec -- $cmd << $text]
+    } on error {result} {
+      return -code error \
+          "markdownify: error from external command: $cmd, $result"
+    }
   }
 
   proc cmds::CmdOrnament {vars int template {parameterVars {}}} {
