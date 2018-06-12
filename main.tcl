@@ -9,24 +9,10 @@ set LibDir [file join $ThisScriptDir lib]
 source [file join $LibDir mapper.tcl]
 source [file join $LibDir cmds.tcl]
 
-set vars [dict create \
-  config [dict create \
-    destination [file normalize site] \
-    content content \
-    includes includes \
-    scripts [file normalize scripts] \
-    markdown {
-      cmd cmark-gfm
-    } \
-  ] \
-  site [dict create \
-    title "The site's title" \
-    subtitle "The site's subtitle" \
-    description "The site's description" \
-    url "http://example.com" \
-    baseurl "" \
-  ]
-]
+# Load vars
+set fp [open config.dict r]
+set vars [read $fp]
+close $fp
 
 # baseurl could by someting like: /myuser
 # so you could have: http://example.com/myuser/blog/...
