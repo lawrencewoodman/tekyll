@@ -16,7 +16,6 @@ namespace eval ::site {
       collection [namespace which CmdCollection] \
       getvar [list [namespace which CmdGetVar] $vars] \
       getparams [list [namespace which CmdGetParams] $vars] \
-      include [list [namespace which CmdInclude] $vars] \
       log [namespace which CmdLog] \
       markdownify [namespace which CmdMarkdownify] \
       ornament [list [namespace which CmdOrnament] $vars] \
@@ -105,48 +104,6 @@ namespace eval ::site {
       return -code error "plugin: error in script: $filename, $result"
     }
     return [$int eval $content]
-  }
-
-  # TODO: For security, force all includes to be relative to the include dir
-  # Default parsers {ornament}
-  proc cmds::CmdInclude {vars int args} {
-    set options {
-      {parsers.arg {ornament}
-         {which parsers to process file (ornament, markdown)}}
-      {parameters.arg  ""
-         {a dictionary of parameters that will be included in the vars}}
-    }
-
-    set usage ": include \[options] filename\noptions:"
-    set parsed [::cmdline::getoptions args $options $usage]
-
-    if {[llength $args] != 1} {
-      return -code error \
-        "include: wrong number of arguments\n[::cmdline::usage $options $usage]"
-    }
-
-    dict for {optionName optionValue} $parsed {
-      switch $optionName {
-        "parameters" {
-          if {[llength $optionValue] > 0} {
-            dict set vars parameters $optionValue
-          }
-        }
-      }
-    }
-    set filename [lindex $args 0]
-
-    set includesDir [file join [dict get $vars config root] includes]
-    set fp [open [file join $includesDir $filename] r]
-    set content [read $fp]
-    close $fp
-    dict set vars content $content
-
-    foreach parser [dict get $parsed "parsers"] {
-      set content [::site::parsers::parse $vars $parser $content]
-      dict set vars content $content
-    }
-    return $content
   }
 
   proc cmds::CmdLog {int level msg} {

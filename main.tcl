@@ -8,7 +8,6 @@ set LibDir [file join $ThisScriptDir lib]
 
 source [file join $LibDir mapper.tcl]
 source [file join $LibDir cmds.tcl]
-source [file join $LibDir parsers.tcl]
 
 set vars [dict create \
   config [dict create \
