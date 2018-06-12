@@ -15,7 +15,6 @@ set vars [dict create \
     content content \
     includes includes \
     scripts [file normalize scripts] \
-    root [file normalize [pwd]] \
     markdown {
       cmd cmark-gfm
     } \

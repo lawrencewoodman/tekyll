@@ -19,7 +19,7 @@ namespace eval ::site {
       log [namespace which CmdLog] \
       markdownify [list [namespace which CmdMarkdownify] $vars] \
       ornament [list [namespace which CmdOrnament] $vars] \
-      plugin [list [namespace which CmdPlugin] $vars]\
+      source [list [namespace which CmdSource] $vars]\
       read [namespace which CmdRead] \
       strip_html [namespace which CmdStripHTML] \
     ]
@@ -94,16 +94,29 @@ namespace eval ::site {
     }
   }
 
-  proc cmds::CmdPlugin {vars int filename} {
+  # TODO: Restrict filenames to subdirectories of root
+  proc cmds::CmdSource {vars int args} {
+    set options {
+      {directory.arg {} {Which directory the file is located in}}
+    }
+    set usage ": source \[options] filename\noptions:"
+    set parsed [::cmdline::getoptions args $options $usage]
+
+    if {[llength $args] != 1} {
+      return -code error \
+        "source: wrong number of arguments\n[::cmdline::usage $options $usage]"
+    }
+
+    set directory [dict get $parsed directory]
     try {
-      set pluginsDir [file join [dict get $vars config root] plugins]
-      set fp [open [file join $pluginsDir $filename] r]
+      set filename [file join [pwd] $directory [lindex $args 0]]
+      set fp [open $filename r]
       set content [read $fp]
       close $fp
-    } on error {result options} {
-      return -code error "plugin: error in script: $filename, $result"
+      return [$int eval $content]
+    } on error {result} {
+      return -code error "source: error in script: $filename, $result"
     }
-    return [$int eval $content]
   }
 
   proc cmds::CmdLog {int level msg} {
