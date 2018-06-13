@@ -157,21 +157,33 @@ namespace eval ::site {
   }
 
   proc cmds::CmdGetVar {vars int args} {
+    set options {
+      {default.arg {} {What to default to in case var doesn't exist}}
+    }
+    set usage ": getvar \[options] key ?key ..?\noptions:"
+    set parsed [::cmdline::getoptions args $options $usage]
+
     # TODO: only allow file and site vars
     if {[dict exists $vars {*}$args]} {
       return [dict get $vars {*}$args]
     }
     # TODO: Is this default a good idea
-    return ""
+    return [dict get $parsed default]
   }
 
   proc cmds::CmdGetParams {vars int args} {
+    set options {
+      {default.arg {} {What to default to in case var doesn't exist}}
+    }
+    set usage ": getparams \[options] key ?key ..?\noptions:"
+    set parsed [::cmdline::getoptions args $options $usage]
+
     # TODO: only allow file and site vars
     if {[dict exists $vars params {*}$args]} {
       return [dict get $vars params {*}$args]
     }
     # TODO: Is this default a good idea
-    return ""
+    return [dict get $parsed default]
   }
 
   proc cmds::CmdRead {int args} {
