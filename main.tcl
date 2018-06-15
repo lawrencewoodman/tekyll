@@ -11,14 +11,17 @@ source [file join $LibDir cmds.tcl]
 
 # Load vars
 set fp [open config.dict r]
-set vars [read $fp]
+set script [ornament compile [read $fp]]
+set cmds [::site::cmds::new map]
+set vars [ornament run $script $cmds]
 close $fp
 
+# In config.dict
 # baseurl could by someting like: /myuser
 # so you could have: http://example.com/myuser/blog/...
 # which would be [dict get $vars site url][dict get $vars site baseurl]/blog
 
-set contentWalker [::fileutil::traverse %AUTO% [dict get $vars build scripts]]
+set contentWalker [::fileutil::traverse %AUTO% scripts]
 
 $contentWalker foreach file {
   if {[file isfile $file]} {
