@@ -160,11 +160,34 @@ namespace eval ::site {
     }
   }
 
-  proc cmds::CmdOrnament {vars int template {parameterVars {}}} {
-    dict set vars params $parameterVars
-    set script [ornament compile $template]
-    set cmds [::site::cmds::new ornament $vars]
-    return [ornament run $script $cmds]
+  proc cmds::CmdOrnament {vars int args} {
+    set options {
+      {params.arg {} {Parameters to pass to the template}}
+      {directory.arg {} {Which directory the file is located in}}
+    }
+    set usage ": ornament \[options] filename\noptions:"
+    set parsed [::cmdline::getoptions args $options $usage]
+
+    if {[llength $args] != 1} {
+      return -code error \
+        "ornament: wrong number of arguments\n[::cmdline::usage $options $usage]"
+    }
+
+    set filename [file join [dict get $parsed directory] [lindex $args 0]]
+    if {![CheckPermissions $vars $filename r]} {
+      return -code error "ornament: permission denied for: $filename"
+    }
+    try {
+      set fp [open $filename r]
+      set template [read $fp]
+      close $fp
+      dict set vars params [dict get $parsed params]
+      set script [ornament compile $template]
+      set cmds [::site::cmds::new ornament $vars]
+      return [ornament run $script $cmds]
+    } on error {result} {
+      return -code error "ornament: error in $filename, $result"
+    }
   }
 
   proc cmds::CmdGetVar {vars int args} {
@@ -235,23 +258,12 @@ namespace eval ::site {
         "read: wrong number of arguments\n[::cmdline::usage $options $usage]"
     }
 
-    dict for {optionName optionValue} $parsed {
-      switch $optionName {
-        "binary" {
-          set binary true
-        }
-        "directory" {
-          set directory $optionValue
-        }
-      }
-    }
-
-    set filename [file join $directory [lindex $args 0]]
+    set filename [file join [dict get $parsed directory] [lindex $args 0]]
     if {![CheckPermissions $vars $filename r]} {
       return -code error "read: permission denied for: $filename"
     }
     set fp [open $filename r]
-    if {$binary} {
+    if {[dict get $parsed binary]} {
       fconfigure $fp -translation binary
     }
     set content [read $fp]
@@ -272,14 +284,6 @@ namespace eval ::site {
         "write: wrong number of arguments\n[::cmdline::usage $options $usage]"
     }
 
-    dict for {optionName optionValue} $parsed {
-      switch $optionName {
-        "binary" {
-          set binary true
-        }
-      }
-    }
-
     set filename [lindex $args 0]
     if {![CheckPermissions $vars $filename w]} {
       return -code error "write: permission denied for: $filename"
@@ -289,7 +293,7 @@ namespace eval ::site {
     # TODO: Only allow to write to destination directory
     file mkdir [file dirname $filename]
     set fp [open $filename w]
-    if {$binary} {
+    if {[dict get $parsed binary]} {
       fconfigure $fp -translation binary
     }
     puts -nonewline $fp $content
