@@ -223,7 +223,6 @@ namespace eval ::site {
   }
 
   proc cmds::CmdRead {vars int args} {
-    # TODO: Only allow to read from content directory or base off config>root
     set options {
       {binary {Whether to use binary translation}}
       {directory.arg {} {Which directory the file is located in}}
