@@ -11,7 +11,7 @@ namespace eval ::site {
     namespace ensemble create
   }
 
-  proc cmds::new {mode vars} {
+  proc cmds::new {mode {vars {}}} {
     set cmds [dict create \
       collection [namespace which CmdCollection] \
       getvar [list [namespace which CmdGetVar] $vars] \
@@ -20,7 +20,7 @@ namespace eval ::site {
       markdownify [list [namespace which CmdMarkdownify] $vars] \
       ornament [list [namespace which CmdOrnament] $vars] \
       source [list [namespace which CmdSource] $vars]\
-      read [namespace which CmdRead] \
+      read [list [namespace which CmdRead] $vars] \
       strip_html [namespace which CmdStripHTML] \
     ]
     set additionalMapCmds [dict create \
@@ -66,16 +66,20 @@ namespace eval ::site {
   # DOCUMENT: -force is set
   proc cmds::SafeCopy {vars args} {
     try {
-      set target [makeFinalPath \
-        [dict get $vars build destination] \
-        [dict get $vars site baseurl] \
-        [lindex $args end] \
-      ]
+      set target [lindex $args end]
+      if {![CheckPermissions $vars $target w]} {
+        return -code error "file copy: permission denied for: $target"
+      }
       file mkdir $target
       set args [lrange $args 0 end-1]
       set numFiles 0
       foreach arg $args {
         set files [glob $arg]
+        foreach file $files {
+          if {![CheckPermissions $vars $file r]} {
+            return -code error "file copy: permission denied for: $file"
+          }
+        }
         incr numFiles [llength $files]
         file copy -force {*}$files $target
       }
@@ -86,15 +90,19 @@ namespace eval ::site {
   }
 
   proc cmds::CmdGlob {int args} {
-    # TODO: Restrict to content directory
     try {
-      return [glob {*}$args]
+      set files [glob {*}$args]
     } on error {result options} {
       return -code error "glob: $result"
     }
+    foreach file $files {
+      if {![CheckPermissions $vars $file r]} {
+        return -code error "glob: permission denied for: $file"
+      }
+    }
+    return $files
   }
 
-  # TODO: Restrict filenames to subdirectories of root
   proc cmds::CmdSource {vars int args} {
     set options {
       {directory.arg {} {Which directory the file is located in}}
@@ -108,8 +116,11 @@ namespace eval ::site {
     }
 
     set directory [dict get $parsed directory]
+    set filename [file join $directory [lindex $args 0]]
+    if {![CheckPermissions $vars $filename r]} {
+      return -code error "source: permission denied for: $filename"
+    }
     try {
-      set filename [file join [pwd] $directory [lindex $args 0]]
       set fp [open $filename r]
       set content [read $fp]
       close $fp
@@ -158,6 +169,7 @@ namespace eval ::site {
 
   proc cmds::CmdGetVar {vars int args} {
     set options {
+      {noerror {Don't return error if key not found}}
       {default.arg {} {What to default to in case var doesn't exist}}
     }
     set usage ": getvar \[options] key ?key ..?\noptions:"
@@ -167,26 +179,50 @@ namespace eval ::site {
     if {[dict exists $vars {*}$args]} {
       return [dict get $vars {*}$args]
     }
-    # TODO: Is this default a good idea
+    if {![dict get $parsed noerror]} {
+      return -code error "getvar: key doesn't exist: $args"
+    }
     return [dict get $parsed default]
   }
 
   proc cmds::CmdGetParams {vars int args} {
     set options {
+      {noerror {Don't return error if key not found}}
       {default.arg {} {What to default to in case var doesn't exist}}
     }
     set usage ": getparams \[options] key ?key ..?\noptions:"
     set parsed [::cmdline::getoptions args $options $usage]
 
-    # TODO: only allow file and site vars
     if {[dict exists $vars params {*}$args]} {
       return [dict get $vars params {*}$args]
     }
-    # TODO: Is this default a good idea
+    if {![dict get $parsed noerror] && [dict get $parsed default] eq ""} {
+      return -code error "getparams: key doesn't exist: $args"
+    }
     return [dict get $parsed default]
   }
 
-  proc cmds::CmdRead {int args} {
+  # wantPermissions is a string
+  # Returns true if wanted permissions all found, otherwise false
+  proc cmds::CheckPermissions {vars path wantPermissions} {
+    set path [file normalize $path]
+    foreach d [dict get $vars build dirs] {
+      lassign $d buildDir buildPermissions
+      set buildDir [file normalize $buildDir]
+      set lengthBuildDir [string length $buildDir]
+      if {$buildDir eq [string range $path 0 $lengthBuildDir-1]} {
+        foreach p [split $wantPermissions {}] {
+          if {[string first $p $buildPermissions] == -1} {
+            return false
+          }
+        }
+        return true
+      }
+    }
+    return false
+  }
+
+  proc cmds::CmdRead {vars int args} {
     # TODO: Only allow to read from content directory or base off config>root
     set options {
       {binary {Whether to use binary translation}}
@@ -211,10 +247,10 @@ namespace eval ::site {
       }
     }
 
-    # TODO: Ensure directory is based off of root or pwd
-    # TODO: Ensure that can't use .. to get to lower than root
-
-    set filename [file join [pwd] $directory [lindex $args 0]]
+    set filename [file join $directory [lindex $args 0]]
+    if {![CheckPermissions $vars $filename r]} {
+      return -code error "read: permission denied for: $filename"
+    }
     set fp [open $filename r]
     if {$binary} {
       fconfigure $fp -translation binary
@@ -245,11 +281,10 @@ namespace eval ::site {
       }
     }
 
-    set filename [makeFinalPath \
-      [dict get $vars build destination] \
-      [dict get $vars site baseurl] \
-      [lindex $args 0] \
-    ]
+    set filename [lindex $args 0]
+    if {![CheckPermissions $vars $filename w]} {
+      return -code error "write: permission denied for: $filename"
+    }
     set content [lindex $args 1]
 
     # TODO: Only allow to write to destination directory
@@ -260,14 +295,6 @@ namespace eval ::site {
     }
     puts -nonewline $fp $content
     close $fp
-  }
-
-  proc cmds::makeFinalPath {destination baseurl path} {
-    set splitPath [file split $path]
-    if {[lindex $splitPath 0] eq "/"} {
-      set splitPath [lrange $splitPath 1 end]
-    }
-    return [file join $destination $baseurl {*}$splitPath]
   }
 
   namespace export cmds

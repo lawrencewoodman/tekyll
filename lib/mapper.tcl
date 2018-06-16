@@ -55,7 +55,7 @@ namespace eval ::site {
   proc mapper::getCollection {name} {
     variable collections
     if {![dict exists $collections $name]} {
-      puts "collections: $collections"
+      return -code error "collection: $name, doesn't exist"
     }
     return [dict get $collections $name]
   }
