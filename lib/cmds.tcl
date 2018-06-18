@@ -150,10 +150,41 @@ namespace eval ::site {
     return $text
   }
 
-  proc cmds::CmdMarkdownify {vars int text} {
+  proc cmds::CmdMarkdownify {vars int args} {
+    set options {
+      {directory.arg {} {Which directory the file is located in}}
+      {file.arg {} {Which file to process}}
+    }
+    set usage "markdownify \[options] ?text?\noptions:"
+    set parsed [::cmdline::getoptions args $options $usage]
+
+    set directory [dict get $parsed directory]
+    set filename [dict get $parsed file]
+    if {$filename ne ""} {
+      if {[llength $args] > 0} {
+        return -code error "markdownify: wrong # args"
+      }
+    } elseif {$directory ne ""} {
+        return -code error \
+          "markdownify: can't use -directory without -file"
+    } elseif {[llength $args] != 1} {
+        return -code error "markdownify: wrong # args"
+    }
+
     set cmd [dict get $vars build markdown cmd]
+
+    # Check cmd isn't blank.  This is a security check to stop the file
+    # being executed instead of the markdown command.
+    if {[string trim $cmd " \t"] eq ""} {
+      return -code error "markdownify: no cmd set in build > markdown > cmd"
+    }
     try {
-      return [exec -- $cmd << $text]
+      set filename [file join $directory $filename]
+      if {[llength $args] == 1} {
+        return [exec -- {*}$cmd << [lindex $args 0]]
+      } else {
+        return [exec -- {*}$cmd $filename]
+      }
     } on error {result} {
       return -code error \
           "markdownify: error from external command: $cmd, $result"
