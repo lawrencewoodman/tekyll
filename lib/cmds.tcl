@@ -17,7 +17,7 @@ namespace eval ::site {
       getvar [list [namespace which CmdGetVar] $vars] \
       getparams [list [namespace which CmdGetParams] $vars] \
       log [namespace which CmdLog] \
-      markdownify [list [namespace which CmdMarkdownify] $vars] \
+      markdown [list [namespace which CmdMarkdownify] $vars] \
       ornament [list [namespace which CmdOrnament] $vars] \
       source [list [namespace which CmdSource] $vars]\
       read [list [namespace which CmdRead] $vars] \
@@ -155,20 +155,20 @@ namespace eval ::site {
       {directory.arg {} {Which directory the file is located in}}
       {file.arg {} {Which file to process}}
     }
-    set usage "markdownify \[options] ?text?\noptions:"
+    set usage "markdown \[options] ?text?\noptions:"
     set parsed [::cmdline::getoptions args $options $usage]
 
     set directory [dict get $parsed directory]
     set filename [dict get $parsed file]
     if {$filename ne ""} {
       if {[llength $args] > 0} {
-        return -code error "markdownify: wrong # args"
+        return -code error "markdown: wrong # args"
       }
     } elseif {$directory ne ""} {
         return -code error \
-          "markdownify: can't use -directory without -file"
+          "markdown: can't use -directory without -file"
     } elseif {[llength $args] != 1} {
-        return -code error "markdownify: wrong # args"
+        return -code error "markdown: wrong # args"
     }
 
     set cmd [dict get $vars build markdown cmd]
@@ -176,7 +176,7 @@ namespace eval ::site {
     # Check cmd isn't blank.  This is a security check to stop the file
     # being executed instead of the markdown command.
     if {[string trim $cmd " \t"] eq ""} {
-      return -code error "markdownify: no cmd set in build > markdown > cmd"
+      return -code error "markdown: no cmd set in build > markdown > cmd"
     }
     try {
       set filename [file join $directory $filename]
@@ -187,7 +187,7 @@ namespace eval ::site {
       }
     } on error {result} {
       return -code error \
-          "markdownify: error from external command: $cmd, $result"
+          "markdown: error from external command: $cmd, $result"
     }
   }
 

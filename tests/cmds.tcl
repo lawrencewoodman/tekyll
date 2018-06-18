@@ -24,7 +24,7 @@ proc TestCmds {cmds body} {
 
 set MarkdownCmd [list tclsh [file join $UtilsDir markdown.tcl]]
 
-test markdownify-1 {Process text passed to it} -setup {
+test markdown-1 {Process text passed to it} -setup {
   set vars [dict create \
     build [dict create \
       markdown [dict create \
@@ -39,7 +39,7 @@ test markdownify-1 {Process text passed to it} -setup {
 
 This is a new paragraph.
 }
-    markdownify $text
+    markdown $text
   }
 } -body {
   TestCmds $cmds $body
@@ -48,7 +48,7 @@ This is a new paragraph.
 <p>This is a new paragraph.</p>}
 
 
-test markdownify-2 {Process a file without -directory} -setup {
+test markdown-2 {Process a file without -directory} -setup {
   set vars [dict create \
     build [dict create \
       markdown [dict create \
@@ -59,7 +59,7 @@ test markdownify-2 {Process a file without -directory} -setup {
   ]
   set cmds [::site::cmds::new map $vars]
   set body {
-    markdownify -file [file join [getvar fixturesDir] simple.md]
+    markdown -file [file join [getvar fixturesDir] simple.md]
   }
 } -body {
   TestCmds $cmds $body
@@ -68,7 +68,7 @@ test markdownify-2 {Process a file without -directory} -setup {
 <p>This is a new paragraph.</p>}
 
 
-test markdownify-3 {Process a file with -directory} -setup {
+test markdown-3 {Process a file with -directory} -setup {
   set vars [dict create \
     build [dict create \
       markdown [dict create \
@@ -79,7 +79,7 @@ test markdownify-3 {Process a file with -directory} -setup {
   ]
   set cmds [::site::cmds::new map $vars]
   set body {
-    markdownify -directory [getvar fixturesDir] -file simple.md
+    markdown -directory [getvar fixturesDir] -file simple.md
   }
 } -body {
   TestCmds $cmds $body
@@ -88,7 +88,7 @@ test markdownify-3 {Process a file with -directory} -setup {
 <p>This is a new paragraph.</p>}
 
 
-test markdownify-4 {Wrong number of arguments with -file} -setup {
+test markdown-4 {Wrong number of arguments with -file} -setup {
   set vars [dict create \
     build [dict create \
       markdown [dict create \
@@ -99,14 +99,14 @@ test markdownify-4 {Wrong number of arguments with -file} -setup {
   ]
   set cmds [::site::cmds::new map $vars]
   set body {
-    markdownify -file simple.md "# This is a title"
+    markdown -file simple.md "# This is a title"
   }
 } -body {
   TestCmds $cmds $body
-} -returnCodes {error} -result {markdownify: wrong # args}
+} -returnCodes {error} -result {markdown: wrong # args}
 
 
-test markdownify-5 {Can't use -directory without -file} -setup {
+test markdown-5 {Can't use -directory without -file} -setup {
   set vars [dict create \
     build [dict create \
       markdown [dict create \
@@ -117,14 +117,14 @@ test markdownify-5 {Can't use -directory without -file} -setup {
   ]
   set cmds [::site::cmds::new map $vars]
   set body {
-    markdownify -directory [getvar fixturesDir]
+    markdown -directory [getvar fixturesDir]
   }
 } -body {
   TestCmds $cmds $body
-} -returnCodes {error} -result {markdownify: can't use -directory without -file}
+} -returnCodes {error} -result {markdown: can't use -directory without -file}
 
 
-test markdownify-6 {Detect missing command if set to "\t"} -setup {
+test markdown-6 {Detect missing command if set to "\t"} -setup {
   set vars [dict create \
     build [dict create \
       markdown [dict create \
@@ -135,14 +135,14 @@ test markdownify-6 {Detect missing command if set to "\t"} -setup {
   ]
   set cmds [::site::cmds::new map $vars]
   set body {
-    markdownify -directory [getvar fixturesDir] -file simple.md
+    markdown -directory [getvar fixturesDir] -file simple.md
   }
 } -body {
   TestCmds $cmds $body
-} -returnCodes {error} -result {markdownify: no cmd set in build > markdown > cmd}
+} -returnCodes {error} -result {markdown: no cmd set in build > markdown > cmd}
 
 
-test markdownify-7 {Detect missing command if set to " "} -setup {
+test markdown-7 {Detect missing command if set to " "} -setup {
   set vars [dict create \
     build [dict create \
       markdown [dict create \
@@ -153,14 +153,14 @@ test markdownify-7 {Detect missing command if set to " "} -setup {
   ]
   set cmds [::site::cmds::new map $vars]
   set body {
-    markdownify -directory [getvar fixturesDir] -file simple.md
+    markdown -directory [getvar fixturesDir] -file simple.md
   }
 } -body {
   TestCmds $cmds $body
-} -returnCodes {error} -result {markdownify: no cmd set in build > markdown > cmd}
+} -returnCodes {error} -result {markdown: no cmd set in build > markdown > cmd}
 
 
-test markdownify-8 {Detect errors from external markdown command} -setup {
+test markdown-8 {Detect errors from external markdown command} -setup {
   set vars [dict create \
     build [dict create \
       markdown [dict create \
@@ -171,8 +171,8 @@ test markdownify-8 {Detect errors from external markdown command} -setup {
   ]
   set cmds [::site::cmds::new map $vars]
   set body {
-    markdownify -directory [getvar fixturesDir] -file simple.md
+    markdown -directory [getvar fixturesDir] -file simple.md
   }
 } -body {
   TestCmds $cmds $body
-} -returnCodes {error} -result "markdownify: error from external command: $MarkdownCmd hello, wrong # args"
+} -returnCodes {error} -result "markdown: error from external command: $MarkdownCmd hello, wrong # args"
