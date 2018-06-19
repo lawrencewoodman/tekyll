@@ -3,11 +3,16 @@
 
 package require fileutil::traverse
 
+#>! if 0 {
 set ThisScriptDir [file dirname [info script]]
 set LibDir [file join $ThisScriptDir lib]
-
 source [file join $LibDir mapper.tcl]
 source [file join $LibDir cmds.tcl]
+#>! }
+#>!* commandSubst true
+#>[read -directory [dir lib] mapper.tcl]
+#>[read -directory [dir lib] cmds.tcl]
+#>!* commandSubst false
 
 # Load vars
 set fp [open tekyll.cfg r]
