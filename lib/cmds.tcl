@@ -89,7 +89,7 @@ namespace eval ::site {
       set args [lrange $args 0 end-1]
       set numFiles 0
       foreach arg $args {
-        set files [glob $arg]
+        set files [glob -- $arg]
         foreach file $files {
           if {![CheckPermissions $vars $file r]} {
             return -code error "file copy: permission denied for: $file"
