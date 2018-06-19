@@ -14,6 +14,7 @@ namespace eval ::site {
   proc cmds::new {mode {vars {}}} {
     set cmds [dict create \
       collection [namespace which CmdCollection] \
+      dir [list [namespace which CmdDir] $vars] \
       getvar [list [namespace which CmdGetVar] $vars] \
       getparams [list [namespace which CmdGetParams] $vars] \
       log [namespace which CmdLog] \
@@ -44,6 +45,21 @@ namespace eval ::site {
   proc cmds::CmdCollection {int name} {
     return [::site::mapper::getCollection $name]
   }
+
+
+  # Lookup the proper directory using its shortName and then file join
+  # the rest of the args to make its full name.  The dirs are stored
+  # in build > dirs.
+  proc cmds::CmdDir {vars int shortName args} {
+    foreach d [dict get $vars build dirs] {
+      lassign $d buildShortName buildDir
+      if {$shortName eq $buildShortName} {
+        return [file join $buildDir {*}$args]
+      }
+    }
+    return -code error "dir: unknown name: $shortName"
+  }
+
 
   proc cmds::CmdFile {vars int subCommand args} {
     # TODO: Ensure this is located within safe locatons: site, content, etc
@@ -261,7 +277,7 @@ namespace eval ::site {
   proc cmds::CheckPermissions {vars path wantPermissions} {
     set path [file normalize $path]
     foreach d [dict get $vars build dirs] {
-      lassign $d buildDir buildPermissions
+      lassign $d shortName buildDir buildPermissions
       set buildDir [file normalize $buildDir]
       set lengthBuildDir [string length $buildDir]
       if {$buildDir eq [string range $path 0 $lengthBuildDir-1]} {

@@ -24,6 +24,45 @@ proc TestCmds {cmds body} {
 
 set MarkdownCmd [list tclsh [file join $UtilsDir markdown.tcl]]
 
+
+test dir-1 {Find correct directory for shortName} -setup {
+  set vars {
+    build {
+      dirs {
+        {destination tmp/site w}
+        {include include r}
+        {plugins plugins r}
+      }
+    }
+  }
+  set cmds [::site::cmds::new map $vars]
+  set body {
+    list [dir plugins] [dir destination] [dir include] [dir include this that]
+  }
+} -body {
+  TestCmds $cmds $body
+} -result [list plugins tmp/site include [file join include this that]]
+
+
+test dir-2 {Return error if can't find shortName} -setup {
+  set vars {
+    build {
+      dirs {
+        {destination tmp/site w}
+        {include include r}
+        {plugins plugins r}
+      }
+    }
+  }
+  set cmds [::site::cmds::new map $vars]
+  set body {
+    dir layout
+  }
+} -body {
+  TestCmds $cmds $body
+} -returnCodes {error} -result "dir: unknown name: layout"
+
+
 test markdown-1 {Process text passed to it} -setup {
   set vars [dict create \
     build [dict create \
