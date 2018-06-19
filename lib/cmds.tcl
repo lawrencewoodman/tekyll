@@ -78,7 +78,6 @@ namespace eval ::site {
            "file: unknown subcommand \"$subCommand\" for file: must be join"
   }
 
-  # DOCUMENT: Takes wildcards and target based off destination/baseurl/
   # DOCUMENT: -force is set
   proc cmds::SafeCopy {vars args} {
     try {

@@ -16,11 +16,6 @@ set cmds [::site::cmds::new map]
 set vars [ornament run $script $cmds]
 close $fp
 
-# In tekyll.cfg
-# baseurl could by someting like: /myuser
-# so you could have: http://example.com/myuser/blog/...
-# which would be [dict get $vars site url][dict get $vars site baseurl]/blog
-
 set contentWalker [::fileutil::traverse %AUTO% scripts]
 
 $contentWalker foreach file {
