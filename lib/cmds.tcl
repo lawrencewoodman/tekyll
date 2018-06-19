@@ -62,7 +62,6 @@ namespace eval ::site {
 
 
   proc cmds::CmdFile {vars int subCommand args} {
-    # TODO: Ensure this is located within safe locatons: site, content, etc
     switch $subCommand {
       copy {
         return [SafeCopy $vars {*}$args]
@@ -358,7 +357,6 @@ namespace eval ::site {
     }
     set content [lindex $args 1]
 
-    # TODO: Only allow to write to destination directory
     file mkdir [file dirname $filename]
     set fp [open $filename w]
     if {[dict get $parsed binary]} {
