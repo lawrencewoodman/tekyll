@@ -63,6 +63,104 @@ test dir-2 {Return error if can't find shortName} -setup {
 } -returnCodes {error} -result "dir: unknown name: layout"
 
 
+test getparam-1 {Return the correct value for key from params} -setup {
+  set vars {
+    params {
+      name fred
+      age 27
+      status {
+        first ready
+        second go
+      }
+    }
+  }
+  set cmds [::site::cmds::new map $vars]
+} -body {
+  TestCmds $cmds {
+    list [getparam name] is [getparam age] [getparam status second]
+  }
+} -result {fred is 27 go}
+
+
+test getparam-2 {Return default if -default set and can't find key} -setup {
+  set vars {
+    params {
+      name fred
+      age 27
+    }
+  }
+  set cmds [::site::cmds::new map $vars]
+} -body {
+  TestCmds $cmds {
+    list [getparam name] is [getparam -default {} name] and \
+         [getparam -default bob name] is known as \
+         [getparam -default harry nickname]
+  }
+} -result [list fred is fred and fred is known as harry]
+
+
+test getparam-3 {Return all params if no key passed} -setup {
+  set vars [dict create \
+    params [dict create \
+      name fred \
+      age 27 \
+    ]
+  ]
+  set cmds [::site::cmds::new map $vars]
+} -body {
+  TestCmds $cmds {
+    getparam
+  }
+} -result [dict create name fred age 27]
+
+
+test getparam-4 {Return error if key doesn't exist} -setup {
+  set vars [dict create \
+    params [dict create \
+      name fred \
+      age 27 \
+    ]
+  ]
+  set cmds [::site::cmds::new map $vars]
+} -body {
+  TestCmds $cmds {
+    getparam status
+  }
+} -returnCodes {error} -result {getparam: unknown key: status}
+
+
+test getparam-5 {Return error if key doesn't exist and -default set to {}} -setup {
+  set vars [dict create \
+    params [dict create \
+      name fred \
+      age 27 \
+    ]
+  ]
+  set cmds [::site::cmds::new map $vars]
+} -body {
+  TestCmds $cmds {
+    getparam -default {} status
+  }
+} -returnCodes {error} -result {getparam: unknown key: status}
+
+
+test getparam-6 {Don't return an error if -noerror set} -setup {
+  set vars [dict create \
+    params [dict create \
+      name fred \
+      age 27 \
+    ]
+  ]
+  set cmds [::site::cmds::new map $vars]
+} -body {
+  TestCmds $cmds {
+    list "status: [getparam -noerror -default {} status]" \
+         "status: [getparam -noerror status]" \
+         "status: [getparam -noerror -default ready status]"
+  }
+} -result {{status: } {status: } {status: ready}}
+
+
 test markdown-1 {Process text passed to it} -setup {
   set vars [dict create \
     build [dict create \

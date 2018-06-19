@@ -16,7 +16,7 @@ namespace eval ::site {
       collection [namespace which CmdCollection] \
       dir [list [namespace which CmdDir] $vars] \
       getvar [list [namespace which CmdGetVar] $vars] \
-      getparams [list [namespace which CmdGetParams] $vars] \
+      getparam [list [namespace which CmdGetParam] $vars] \
       log [namespace which CmdLog] \
       markdown [list [namespace which CmdMarkdownify] $vars] \
       ornament [list [namespace which CmdOrnament] $vars] \
@@ -255,19 +255,19 @@ namespace eval ::site {
     return [dict get $parsed default]
   }
 
-  proc cmds::CmdGetParams {vars int args} {
+  proc cmds::CmdGetParam {vars int args} {
     set options {
       {noerror {Don't return error if key not found}}
       {default.arg {} {What to default to in case var doesn't exist}}
     }
-    set usage ": getparams \[options] key ?key ..?\noptions:"
+    set usage ": getparam \[options] key ?key ..?\noptions:"
     set parsed [::cmdline::getoptions args $options $usage]
 
     if {[dict exists $vars params {*}$args]} {
       return [dict get $vars params {*}$args]
     }
     if {![dict get $parsed noerror] && [dict get $parsed default] eq ""} {
-      return -code error "getparams: key doesn't exist: $args"
+      return -code error "getparam: unknown key: $args"
     }
     return [dict get $parsed default]
   }
