@@ -5,7 +5,6 @@ package require ornament
 
 namespace eval ::site {
 
-  # TODO: Rename siteDir throughout this file
   namespace eval mapper {
     namespace export {[a-z]*}
     namespace ensemble create
@@ -18,7 +17,6 @@ namespace eval ::site {
       set cmds [::site::cmds::new map $vars]
       dict set cmds collect [namespace which CmdCollect]
       load $file $cmds $vars
-      #ProcessFile $map $dir $vars
     } on error {result options} {
       return -code error "error processing: $file, $result"
     }
