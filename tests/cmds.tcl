@@ -25,6 +25,35 @@ proc TestCmds {cmds body} {
 set MarkdownCmd [list tclsh [file join $UtilsDir markdown.tcl]]
 
 
+test collection-1 {Return correct collection} -setup {
+  set vars {}
+  set cmds [cmds::new map $vars]
+} -body {
+  TestCmds $cmds {
+    collect people {name fred age 27}
+    collect people {name bob age 29}
+    collect places Caerdydd
+    collect places Abertawe
+    list [collection people] [collection places]
+  }
+} -result {{{name fred age 27} {name bob age 29}} {Caerdydd Abertawe}}
+
+
+test collection-2 {Return error if name doesn't exist} -setup {
+  set vars {}
+  set cmds [cmds::new map $vars]
+  set body {
+    list [dir plugins] [dir destination] [dir include] [dir include this that]
+  }
+} -body {
+  TestCmds $cmds {
+    collect people {name fred age 27}
+    collect people {name bob age 29}
+    list [collection people] [collection time]
+  }
+} -returnCodes {error} -result {collection: unknown name: time}
+
+
 test dir-1 {Find correct directory for shortName} -setup {
   set vars {
     build {

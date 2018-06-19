@@ -6,23 +6,15 @@ package require ornament
 namespace eval mapper {
   namespace export {[a-z]*}
   namespace ensemble create
-  variable collections [dict create]
 }
 
 proc mapper::process {file vars} {
-  variable collections
   try {
     set cmds [::cmds::new map $vars]
-    dict set cmds collect [namespace which CmdCollect]
     load $file $cmds $vars
   } on error {result options} {
     return -code error "error processing: $file, $result"
   }
-}
-
-proc mapper::CmdCollect {int collection vars} {
-  variable collections
-  dict lappend collections $collection $vars
 }
 
 proc mapper::load {file cmds vars} {
@@ -47,14 +39,3 @@ proc mapper::load {file cmds vars} {
     interp delete $safeInterp
   }
 }
-
-proc mapper::getCollection {name} {
-  variable collections
-  if {![dict exists $collections $name]} {
-    return -code error "collection: $name, doesn't exist"
-  }
-  return [dict get $collections $name]
-}
-
-
-namespace export posts

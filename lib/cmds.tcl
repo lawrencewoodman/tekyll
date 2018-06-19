@@ -7,10 +7,12 @@ package require cmdline
 namespace eval cmds {
   namespace export {[a-z]*}
   namespace ensemble create
+  variable collections [dict create]
 }
 
 proc cmds::new {mode {vars {}}} {
   set cmds [dict create \
+    collect [namespace which CmdCollect] \
     collection [namespace which CmdCollection] \
     dir [list [namespace which CmdDir] $vars] \
     getvar [list [namespace which CmdGetVar] $vars] \
@@ -40,8 +42,19 @@ proc cmds::new {mode {vars {}}} {
   }
 }
 
+
 proc cmds::CmdCollection {int name} {
-  return [mapper::getCollection $name]
+  variable collections
+  if {![dict exists $collections $name]} {
+    return -code error "collection: unknown name: $name"
+  }
+  return [dict get $collections $name]
+}
+
+
+proc cmds::CmdCollect {int collection vars} {
+  variable collections
+  dict lappend collections $collection $vars
 }
 
 
