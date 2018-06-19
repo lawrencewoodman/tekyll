@@ -17,7 +17,7 @@ source [file join $LibDir cmds.tcl]
 # Load vars
 set fp [open tekyll.cfg r]
 set script [ornament compile [read $fp]]
-set cmds [::site::cmds::new map]
+set cmds [cmds::new map]
 set vars [ornament run $script $cmds]
 close $fp
 
@@ -32,5 +32,5 @@ $contentWalker foreach file {
 set files [lsort $files]
 foreach file $files {
   puts "Processing: $file"
-  ::site::mapper process $file $vars
+  mapper process $file $vars
 }

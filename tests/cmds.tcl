@@ -35,7 +35,7 @@ test dir-1 {Find correct directory for shortName} -setup {
       }
     }
   }
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
   set body {
     list [dir plugins] [dir destination] [dir include] [dir include this that]
   }
@@ -54,7 +54,7 @@ test dir-2 {Return error if can't find shortName} -setup {
       }
     }
   }
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
   set body {
     dir layout
   }
@@ -74,7 +74,7 @@ test getparam-1 {Return the correct value for key from params} -setup {
       }
     }
   }
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
 } -body {
   TestCmds $cmds {
     list [getparam name] is [getparam age] [getparam status second]
@@ -89,7 +89,7 @@ test getparam-2 {Return default if -default set and can't find key} -setup {
       age 27
     }
   }
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
 } -body {
   TestCmds $cmds {
     list [getparam name] is [getparam -default {} name] and \
@@ -106,7 +106,7 @@ test getparam-3 {Return all params if no key passed} -setup {
       age 27 \
     ]
   ]
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
 } -body {
   TestCmds $cmds {
     getparam
@@ -121,7 +121,7 @@ test getparam-4 {Return error if key doesn't exist} -setup {
       age 27 \
     ]
   ]
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
 } -body {
   TestCmds $cmds {
     getparam status
@@ -136,7 +136,7 @@ test getparam-5 {Return error if key doesn't exist and -default set to {}} -setu
       age 27 \
     ]
   ]
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
 } -body {
   TestCmds $cmds {
     getparam -default {} status
@@ -151,7 +151,7 @@ test getparam-6 {Don't return an error if -noerror set} -setup {
       age 27 \
     ]
   ]
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
 } -body {
   TestCmds $cmds {
     list "status: [getparam -noerror -default {} status]" \
@@ -169,7 +169,7 @@ test markdown-1 {Process text passed to it} -setup {
       ]
     ]
   ]
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
   set body {
     set text {
 # This is a title
@@ -194,7 +194,7 @@ test markdown-2 {Process a file without -directory} -setup {
     ] \
     fixturesDir $FixturesDir
   ]
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
   set body {
     markdown -file [file join [getvar fixturesDir] simple.md]
   }
@@ -214,7 +214,7 @@ test markdown-3 {Process a file with -directory} -setup {
     ] \
     fixturesDir $FixturesDir
   ]
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
   set body {
     markdown -directory [getvar fixturesDir] -file simple.md
   }
@@ -234,7 +234,7 @@ test markdown-4 {Wrong number of arguments with -file} -setup {
     ] \
     fixturesDir $FixturesDir
   ]
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
   set body {
     markdown -file simple.md "# This is a title"
   }
@@ -252,7 +252,7 @@ test markdown-5 {Can't use -directory without -file} -setup {
     ] \
     fixturesDir $FixturesDir
   ]
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
   set body {
     markdown -directory [getvar fixturesDir]
   }
@@ -270,7 +270,7 @@ test markdown-6 {Detect missing command if set to "\t"} -setup {
     ] \
     fixturesDir $FixturesDir
   ]
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
   set body {
     markdown -directory [getvar fixturesDir] -file simple.md
   }
@@ -288,7 +288,7 @@ test markdown-7 {Detect missing command if set to " "} -setup {
     ] \
     fixturesDir $FixturesDir
   ]
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
   set body {
     markdown -directory [getvar fixturesDir] -file simple.md
   }
@@ -306,7 +306,7 @@ test markdown-8 {Detect errors from external markdown command} -setup {
     ] \
     fixturesDir $FixturesDir
   ]
-  set cmds [::site::cmds::new map $vars]
+  set cmds [cmds::new map $vars]
   set body {
     markdown -directory [getvar fixturesDir] -file simple.md
   }
