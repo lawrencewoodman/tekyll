@@ -194,10 +194,10 @@ namespace eval ::site {
       return -code error "markdown: no cmd set in build > markdown > cmd"
     }
     try {
-      set filename [file join $directory $filename]
       if {[llength $args] == 1} {
         return [exec -- {*}$cmd << [lindex $args 0]]
       } else {
+        set filename [file join $directory $filename]
         return [exec -- {*}$cmd $filename]
       }
     } on error {result} {
@@ -210,29 +210,51 @@ namespace eval ::site {
     set options {
       {params.arg {} {Parameters to pass to the template}}
       {directory.arg {} {Which directory the file is located in}}
+      {file.arg {} {Which file to process}}
     }
     set usage ": ornament \[options] filename\noptions:"
     set parsed [::cmdline::getoptions args $options $usage]
 
-    if {[llength $args] != 1} {
-      return -code error \
-        "ornament: wrong number of arguments\n[::cmdline::usage $options $usage]"
+    set directory [dict get $parsed directory]
+    set filename [dict get $parsed file]
+    if {$filename ne ""} {
+      if {[llength $args] > 0} {
+        return -code error "ornament: wrong # args"
+      }
+    } elseif {$directory ne ""} {
+        return -code error \
+          "ornament: can't use -directory without -file"
+    } elseif {[llength $args] != 1} {
+        return -code error "ornament: wrong # args"
     }
 
-    set filename [file join [dict get $parsed directory] [lindex $args 0]]
-    if {![CheckPermissions $vars $filename r]} {
-      return -code error "ornament: permission denied for: $filename"
+    if {$filename ne ""} {
+      set filename [file join $directory $filename]
+      if {![CheckPermissions $vars $filename r]} {
+        return -code error "ornament: permission denied for: $filename"
+      }
+      try {
+        set fp [open $filename r]
+        set template [read $fp]
+      } on error {result} {
+        return -code error "ornament: error in $filename, $result"
+      } finally {
+        close $fp
+      }
+    } else {
+      set template [lindex $args 0]
     }
     try {
-      set fp [open $filename r]
-      set template [read $fp]
-      close $fp
       dict set vars params [dict get $parsed params]
       set script [ornament compile $template]
       set cmds [::site::cmds::new ornament $vars]
       return [ornament run $script $cmds]
     } on error {result} {
-      return -code error "ornament: error in $filename, $result"
+      if {$filename ne ""} {
+        return -code error "ornament: error in $filename, $result"
+      } else {
+        return -code error "ornament: $result"
+      }
     }
   }
 
