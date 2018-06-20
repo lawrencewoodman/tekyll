@@ -3,7 +3,8 @@ addons:
   apt:
     packages:
       - tcl
-script:
+
+install:
   # Install tcllib
   - wget https://core.tcl.tk/tcllib/uv/tcllib-1.19.zip
   - unzip tcllib-1.19.zip
@@ -11,6 +12,6 @@ script:
   - sudo tclsh installer.tcl -no-gui -no-wait
   - cd ..
 
-  #- tclsh info.tcl
+script:
   # Run the tests
   - tclsh tests/*.test.tcl
