@@ -1,0 +1,8 @@
+language: generic
+addons:
+  apt:
+    packages:
+      - tcl
+script:
+  # Run the tests
+  - tclsh tests/*.test.tcl
