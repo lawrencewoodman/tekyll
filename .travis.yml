@@ -5,6 +5,7 @@ addons:
       - tcl
       - tcllib
 script:
+  - apt-cache search tcllib | grep '^tcllib'
   - tclsh info.tcl
   # Run the tests
   - tclsh tests/*.test.tcl
