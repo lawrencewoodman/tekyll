@@ -11,6 +11,6 @@ script:
   - sudo tclsh installer.tcl -no-gui -no-wait
   - cd ..
 
-  - tclsh info.tcl
+  #- tclsh info.tcl
   # Run the tests
   - tclsh tests/*.test.tcl
