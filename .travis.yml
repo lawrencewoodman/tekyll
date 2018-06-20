@@ -8,7 +8,8 @@ script:
   - wget https://core.tcl.tk/tcllib/uv/tcllib-1.19.zip
   - unzip tcllib-1.19.zip
   - cd tcllib-1.19
-  - sudo tclsh installer.tcl -dry-run -no-gui -no-wait
+  - sudo tclsh installer.tcl -no-gui -no-wait
+  - cd ..
 
   - tclsh info.tcl
   # Run the tests
