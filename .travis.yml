@@ -3,9 +3,13 @@ addons:
   apt:
     packages:
       - tcl
-      - tcllib
 script:
-  - apt-cache search tcllib | grep '^tcllib'
+  # Install tcllib
+  - wget https://core.tcl.tk/tcllib/uv/tcllib-1.19.zip
+  - unzip tcllib-1.19.zip
+  - cd tcllib-1.19
+  - sudo tclsh installer.tcl -dry-run -no-gui -no-wait
+
   - tclsh info.tcl
   # Run the tests
   - tclsh tests/*.test.tcl
