@@ -7,10 +7,12 @@ package require fileutil::traverse
 set ThisScriptDir [file dirname [info script]]
 set LibDir [file join $ThisScriptDir lib]
 source [file join $LibDir mapper.tcl]
+source [file join $LibDir misc.tcl]
 source [file join $LibDir cmds.tcl]
 #>! }
 #>!* commandSubst true
 #>[read -directory [dir lib] mapper.tcl]
+#>[read -directory [dir lib] misc.tcl]
 #>[read -directory [dir lib] cmds.tcl]
 #>!* commandSubst false
 
@@ -21,7 +23,7 @@ set cmds [cmds::new]
 set vars [ornament run $script $cmds]
 close $fp
 
-set contentWalker [::fileutil::traverse %AUTO% scripts]
+set contentWalker [::fileutil::traverse %AUTO% [getDir $vars init]]
 
 $contentWalker foreach file {
   if {[file isfile $file]} {
@@ -31,6 +33,5 @@ $contentWalker foreach file {
 
 set files [lsort $files]
 foreach file $files {
-  puts "Processing: $file"
   mapper process $file $vars
 }

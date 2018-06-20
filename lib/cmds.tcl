@@ -49,13 +49,11 @@ proc cmds::CmdCollect {int collection vars} {
 # the rest of the args to make its full name.  The dirs are stored
 # in build > dirs.
 proc cmds::CmdDir {vars int shortName args} {
-  foreach d [dict get $vars build dirs] {
-    lassign $d buildShortName buildDir
-    if {$shortName eq $buildShortName} {
-      return [file join $buildDir {*}$args]
-    }
+  try {
+    return [getDir $vars $shortName {*}$args]
+  } on error {result} {
+    return -code error "dir: $result"
   }
-  return -code error "dir: unknown name: $shortName"
 }
 
 
@@ -79,7 +77,7 @@ proc cmds::CmdFile {vars int subCommand args} {
 proc cmds::SafeCopy {vars args} {
   try {
     set target [lindex $args end]
-    if {![CheckPermissions $vars $target w]} {
+    if {![checkPermissions $vars $target w]} {
       return -code error "file copy: permission denied for: $target"
     }
     file mkdir $target
@@ -88,7 +86,7 @@ proc cmds::SafeCopy {vars args} {
     foreach arg $args {
       set files [glob -- $arg]
       foreach file $files {
-        if {![CheckPermissions $vars $file r]} {
+        if {![checkPermissions $vars $file r]} {
           return -code error "file copy: permission denied for: $file"
         }
       }
@@ -108,7 +106,7 @@ proc cmds::CmdGlob {int args} {
     return -code error "glob: $result"
   }
   foreach file $files {
-    if {![CheckPermissions $vars $file r]} {
+    if {![checkPermissions $vars $file r]} {
       return -code error "glob: permission denied for: $file"
     }
   }
@@ -129,7 +127,7 @@ proc cmds::CmdSource {vars int args} {
 
   set directory [dict get $parsed directory]
   set filename [file join $directory [lindex $args 0]]
-  if {![CheckPermissions $vars $filename r]} {
+  if {![checkPermissions $vars $filename r]} {
     return -code error "source: permission denied for: $filename"
   }
   try {
@@ -227,7 +225,7 @@ proc cmds::CmdOrnament {vars int args} {
 
   if {$filename ne ""} {
     set filename [file join $directory $filename]
-    if {![CheckPermissions $vars $filename r]} {
+    if {![checkPermissions $vars $filename r]} {
       return -code error "ornament: permission denied for: $filename"
     }
     try {
@@ -290,26 +288,6 @@ proc cmds::CmdGetParam {vars int args} {
   return [dict get $parsed default]
 }
 
-# wantPermissions is a string
-# Returns true if wanted permissions all found, otherwise false
-proc cmds::CheckPermissions {vars path wantPermissions} {
-  set path [file normalize $path]
-  foreach d [dict get $vars build dirs] {
-    lassign $d shortName buildDir buildPermissions
-    set buildDir [file normalize $buildDir]
-    set lengthBuildDir [string length $buildDir]
-    if {$buildDir eq [string range $path 0 $lengthBuildDir-1]} {
-      foreach p [split $wantPermissions {}] {
-        if {[string first $p $buildPermissions] == -1} {
-          return false
-        }
-      }
-      return true
-    }
-  }
-  return false
-}
-
 proc cmds::CmdRead {vars int args} {
   set options {
     {binary {Whether to use binary translation}}
@@ -324,7 +302,7 @@ proc cmds::CmdRead {vars int args} {
   }
 
   set filename [file join [dict get $parsed directory] [lindex $args 0]]
-  if {![CheckPermissions $vars $filename r]} {
+  if {![checkPermissions $vars $filename r]} {
     return -code error "read: permission denied for: $filename"
   }
   set fp [open $filename r]
@@ -350,7 +328,7 @@ proc cmds::CmdWrite {vars int args} {
   }
 
   set filename [lindex $args 0]
-  if {![CheckPermissions $vars $filename w]} {
+  if {![checkPermissions $vars $filename w]} {
     return -code error "write: permission denied for: $filename"
   }
   set content [lindex $args 1]

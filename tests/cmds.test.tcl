@@ -7,6 +7,7 @@ set LibDir [file join $ThisScriptDir .. lib]
 set UtilsDir [file normalize [file join $ThisScriptDir utils]]
 set FixturesDir [file normalize [file join $ThisScriptDir fixtures]]
 
+source [file join $LibDir "misc.tcl"]
 source [file join $LibDir "cmds.tcl"]
 
 proc TestCmds {cmds body} {

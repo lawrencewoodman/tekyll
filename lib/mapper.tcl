@@ -9,15 +9,11 @@ namespace eval mapper {
 }
 
 proc mapper::process {file vars} {
-  try {
-    set cmds [::cmds::new $vars]
-    load $file $cmds $vars
-  } on error {result options} {
-    return -code error "error processing: $file, $result"
+  set cmds [::cmds::new $vars]
+  if {![checkPermissions $vars $file r]} {
+    return -code error "error processing: $file, permission denied"
   }
-}
-
-proc mapper::load {file cmds vars} {
+  puts "Processing: $file"
   set safeInterp [interp create -safe]
   try {
     set fp [open $file r]
@@ -34,7 +30,7 @@ proc mapper::load {file cmds vars} {
     #}
     return [$safeInterp eval $map]
   } on error {result options} {
-    return -code error $result
+    return -code error "error processing $file, $result"
   } finally {
     interp delete $safeInterp
   }
