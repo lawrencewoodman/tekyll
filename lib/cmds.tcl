@@ -10,7 +10,7 @@ namespace eval cmds {
   variable collections [dict create]
 }
 
-proc cmds::new {mode {vars {}}} {
+proc cmds::new {{vars {}}} {
   set cmds [dict create \
     collect [namespace which CmdCollect] \
     collection [namespace which CmdCollection] \
@@ -23,23 +23,10 @@ proc cmds::new {mode {vars {}}} {
     source [list [namespace which CmdSource] $vars]\
     read [list [namespace which CmdRead] $vars] \
     strip_html [namespace which CmdStripHTML] \
-  ]
-  set additionalMapCmds [dict create \
     file [list [namespace which CmdFile] $vars] \
     glob [namespace which CmdGlob] \
     write [list [namespace which CmdWrite] $vars] \
   ]
-  switch $mode {
-    ornament {
-      return $cmds
-    }
-    map {
-      return [dict merge $cmds $additionalMapCmds]
-    }
-    default {
-      error "unknown mode: $mode"
-    }
-  }
 }
 
 
@@ -257,7 +244,7 @@ proc cmds::CmdOrnament {vars int args} {
   try {
     dict set vars params [dict get $parsed params]
     set script [ornament compile $template]
-    set cmds [new ornament $vars]
+    set cmds [new $vars]
     return [ornament run $script $cmds]
   } on error {result} {
     if {$filename ne ""} {

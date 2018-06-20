@@ -10,7 +10,7 @@ namespace eval mapper {
 
 proc mapper::process {file vars} {
   try {
-    set cmds [::cmds::new map $vars]
+    set cmds [::cmds::new $vars]
     load $file $cmds $vars
   } on error {result options} {
     return -code error "error processing: $file, $result"
