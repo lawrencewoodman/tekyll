@@ -3,6 +3,7 @@ addons:
   apt:
     packages:
       - tcl
+      - tcllib
 script:
   # Run the tests
   - tclsh tests/*.test.tcl
