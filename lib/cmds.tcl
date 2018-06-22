@@ -18,7 +18,7 @@ proc cmds::new {{vars {}}} {
     getvar [list [namespace which CmdGetVar] $vars] \
     getparam [list [namespace which CmdGetParam] $vars] \
     log [namespace which CmdLog] \
-    markdown [list [namespace which CmdMarkdownify] $vars] \
+    markdown [list [namespace which CmdMarkdown] $vars] \
     ornament [list [namespace which CmdOrnament] $vars] \
     source [list [namespace which CmdSource] $vars]\
     read [list [namespace which CmdRead] $vars] \
@@ -160,7 +160,7 @@ proc cmds::CmdStripHTML {int html} {
   return $text
 }
 
-proc cmds::CmdMarkdownify {vars int args} {
+proc cmds::CmdMarkdown {vars int args} {
   set options {
     {directory.arg {} {Which directory the file is located in}}
     {file.arg {} {Which file to process}}
