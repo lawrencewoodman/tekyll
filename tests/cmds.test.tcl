@@ -26,33 +26,51 @@ proc TestCmds {cmds body} {
 set MarkdownCmd [list tclsh [file join $UtilsDir markdown.tcl]]
 
 
-test collection-1 {Return correct collection} -setup {
+test collection-1 {Return error if subcommand} -setup {
   set vars {}
   set cmds [cmds::new $vars]
 } -body {
   TestCmds $cmds {
-    collect people {name fred age 27}
-    collect people {name bob age 29}
-    collect places Caerdydd
-    collect places Abertawe
-    list [collection people] [collection places]
+    collection fred
+  }
+} -returnCodes {error} -result {collection: invalid subcommand: fred}
+
+
+test collection-get-1 {Return correct collection with get} -setup {
+  set vars {}
+  set cmds [cmds::new $vars]
+} -body {
+  TestCmds $cmds {
+    collection add people {name fred age 27}
+    collection add people {name bob age 29}
+    collection add places Caerdydd
+    collection add places Abertawe
+    list [collection get people] [collection get places]
   }
 } -result {{{name fred age 27} {name bob age 29}} {Caerdydd Abertawe}}
 
 
-test collection-2 {Return error if name doesn't exist} -setup {
+test collection-get-2 {Return error if name doesn't exist with get} -setup {
   set vars {}
   set cmds [cmds::new $vars]
-  set body {
-    list [dir plugins] [dir destination] [dir include] [dir include this that]
-  }
 } -body {
   TestCmds $cmds {
-    collect people {name fred age 27}
-    collect people {name bob age 29}
-    list [collection people] [collection time]
+    collection add people {name fred age 27}
+    collection add people {name bob age 29}
+    list [collection get people] [collection get time]
   }
-} -returnCodes {error} -result {collection: unknown name: time}
+} -returnCodes {error} -result {collection get: unknown name: time}
+
+
+test collection-get-3 {Return error if wrong number of args with get} -setup {
+  set vars {}
+  set cmds [cmds::new $vars]
+} -body {
+  TestCmds $cmds {
+    collection add people {name fred age 27}
+    collection get people hello
+  }
+} -returnCodes {error} -result {collection get: wrong # args}
 
 
 test dir-1 {Find correct directory for shortName} -setup {

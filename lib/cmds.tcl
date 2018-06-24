@@ -12,7 +12,6 @@ namespace eval cmds {
 
 proc cmds::new {{vars {}}} {
   set cmds [dict create \
-    collect [namespace which CmdCollect] \
     collection [namespace which CmdCollection] \
     dir [list [namespace which CmdDir] $vars] \
     getvar [list [namespace which CmdGetVar] $vars] \
@@ -29,17 +28,33 @@ proc cmds::new {{vars {}}} {
   ]
 }
 
+proc cmds::CmdCollection {int subCommand args} {
+  set subCommands {
+    get {numArgs 1 cmd CmdCollectionGet}
+    add {numArgs 2 cmd CmdCollectionAdd}
+  }
+  if {![dict exists $subCommands $subCommand]} {
+    return -code error "collection: invalid subcommand: $subCommand"
+  }
+  dict with subCommands $subCommand {
+    if {[llength $args] != $numArgs} {
+      return -code error "collection $subCommand: wrong # args"
+    }
+    return [$cmd {*}$args]
+  }
+}
 
-proc cmds::CmdCollection {int name} {
+
+proc cmds::CmdCollectionGet {name} {
   variable collections
   if {![dict exists $collections $name]} {
-    return -code error "collection: unknown name: $name"
+    return -code error "collection get: unknown name: $name"
   }
   return [dict get $collections $name]
 }
 
 
-proc cmds::CmdCollect {int collection vars} {
+proc cmds::CmdCollectionAdd {collection vars} {
   variable collections
   dict lappend collections $collection $vars
 }
