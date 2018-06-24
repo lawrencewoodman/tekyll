@@ -84,11 +84,10 @@ test dir-1 {Find correct directory for shortName} -setup {
     }
   }
   set cmds [cmds::new $vars]
-  set body {
+} -body {
+  TestCmds $cmds {
     list [dir plugins] [dir destination] [dir include] [dir include this that]
   }
-} -body {
-  TestCmds $cmds $body
 } -result [list plugins tmp/site include [file join include this that]]
 
 
@@ -103,11 +102,10 @@ test dir-2 {Return error if can't find shortName} -setup {
     }
   }
   set cmds [cmds::new $vars]
-  set body {
+} -body {
+  TestCmds $cmds {
     dir layout
   }
-} -body {
-  TestCmds $cmds $body
 } -returnCodes {error} -result "dir: unknown name: layout"
 
 
@@ -243,11 +241,10 @@ test markdown-2 {Process a file without -directory} -setup {
     fixturesDir $FixturesDir
   ]
   set cmds [cmds::new $vars]
-  set body {
+} -body {
+  TestCmds $cmds {
     markdown -file [file join [getvar fixturesDir] simple.md]
   }
-} -body {
-  TestCmds $cmds $body
 } -result {<h1>This is a title</h1>
 
 <p>This is a new paragraph.</p>}
@@ -263,11 +260,10 @@ test markdown-3 {Process a file with -directory} -setup {
     fixturesDir $FixturesDir
   ]
   set cmds [cmds::new $vars]
-  set body {
+} -body {
+  TestCmds $cmds {
     markdown -directory [getvar fixturesDir] -file simple.md
   }
-} -body {
-  TestCmds $cmds $body
 } -result {<h1>This is a title</h1>
 
 <p>This is a new paragraph.</p>}
@@ -283,11 +279,10 @@ test markdown-4 {Wrong number of arguments with -file} -setup {
     fixturesDir $FixturesDir
   ]
   set cmds [cmds::new $vars]
-  set body {
+} -body {
+  TestCmds $cmds {
     markdown -file simple.md "# This is a title"
   }
-} -body {
-  TestCmds $cmds $body
 } -returnCodes {error} -result {markdown: wrong # args}
 
 
@@ -301,11 +296,10 @@ test markdown-5 {Can't use -directory without -file} -setup {
     fixturesDir $FixturesDir
   ]
   set cmds [cmds::new $vars]
-  set body {
+} -body {
+  TestCmds $cmds {
     markdown -directory [getvar fixturesDir]
   }
-} -body {
-  TestCmds $cmds $body
 } -returnCodes {error} -result {markdown: can't use -directory without -file}
 
 
@@ -319,11 +313,10 @@ test markdown-6 {Detect missing command if set to "\t"} -setup {
     fixturesDir $FixturesDir
   ]
   set cmds [cmds::new $vars]
-  set body {
+} -body {
+  TestCmds $cmds {
     markdown -directory [getvar fixturesDir] -file simple.md
   }
-} -body {
-  TestCmds $cmds $body
 } -returnCodes {error} -result {markdown: no cmd set in build > markdown > cmd}
 
 
@@ -337,11 +330,10 @@ test markdown-7 {Detect missing command if set to " "} -setup {
     fixturesDir $FixturesDir
   ]
   set cmds [cmds::new $vars]
-  set body {
+} -body {
+  TestCmds $cmds {
     markdown -directory [getvar fixturesDir] -file simple.md
   }
-} -body {
-  TestCmds $cmds $body
 } -returnCodes {error} -result {markdown: no cmd set in build > markdown > cmd}
 
 
@@ -355,9 +347,8 @@ test markdown-8 {Detect errors from external markdown command} -setup {
     fixturesDir $FixturesDir
   ]
   set cmds [cmds::new $vars]
-  set body {
+} -body {
+  TestCmds $cmds {
     markdown -directory [getvar fixturesDir] -file simple.md
   }
-} -body {
-  TestCmds $cmds $body
 } -returnCodes {error} -result "markdown: error from external command: $MarkdownCmd hello, wrong # args"
