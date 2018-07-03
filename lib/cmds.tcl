@@ -245,6 +245,10 @@ proc cmds::CmdOrnament {vars int args} {
     }
     try {
       set fp [open $filename r]
+    } on error {result} {
+      return -code error "ornament: $result"
+    }
+    try {
       set template [read $fp]
     } on error {result} {
       return -code error "ornament: error in $filename, $result"

@@ -352,3 +352,18 @@ test markdown-8 {Detect errors from external markdown command} -setup {
     markdown -directory [getvar fixturesDir] -file simple.md
   }
 } -returnCodes {error} -result "markdown: error from external command: $MarkdownCmd hello, wrong # args"
+
+
+test ornament-1 {Detect errors when opening template file} -setup {
+  set vars [dict create \
+    build [dict create \
+      dirs [list [list fixturesDir $FixturesDir r]] \
+    ] \
+    fixturesDir $FixturesDir
+  ]
+  set cmds [cmds::new $vars]
+} -body {
+  TestCmds $cmds {
+    ornament -directory [getvar fixturesDir] -file notexist.tpl
+  }
+} -returnCodes {error} -result "ornament: couldn't open \"[file join $FixturesDir notexist.tpl]\": no such file or directory"
