@@ -236,14 +236,14 @@ test markdown-2 {Process a file without -directory} -setup {
     build [dict create \
       markdown [dict create \
         cmd $MarkdownCmd
-      ]
-    ] \
-    fixturesDir $FixturesDir
+      ] \
+      dirs [list [list fixturesDir $FixturesDir r]] \
+    ]
   ]
   set cmds [cmds::new $vars]
 } -body {
   TestCmds $cmds {
-    markdown -file [file join [getvar fixturesDir] simple.md]
+    markdown -file [file join [dir fixturesDir] simple.md]
   }
 } -result {<h1>This is a title</h1>
 
@@ -255,14 +255,14 @@ test markdown-3 {Process a file with -directory} -setup {
     build [dict create \
       markdown [dict create \
         cmd $MarkdownCmd
-      ]
-    ] \
-    fixturesDir $FixturesDir
+      ] \
+      dirs [list [list fixturesDir $FixturesDir r]] \
+    ]
   ]
   set cmds [cmds::new $vars]
 } -body {
   TestCmds $cmds {
-    markdown -directory [getvar fixturesDir] -file simple.md
+    markdown -directory [dir fixturesDir] -file simple.md
   }
 } -result {<h1>This is a title</h1>
 
@@ -274,9 +274,9 @@ test markdown-4 {Wrong number of arguments with -file} -setup {
     build [dict create \
       markdown [dict create \
         cmd $MarkdownCmd
-      ]
-    ] \
-    fixturesDir $FixturesDir
+      ] \
+      dirs [list [list fixturesDir $FixturesDir r]] \
+    ]
   ]
   set cmds [cmds::new $vars]
 } -body {
@@ -291,14 +291,14 @@ test markdown-5 {Can't use -directory without -file} -setup {
     build [dict create \
       markdown [dict create \
         cmd $MarkdownCmd
-      ]
-    ] \
-    fixturesDir $FixturesDir
+      ] \
+      dirs [list [list fixturesDir $FixturesDir r]] \
+    ]
   ]
   set cmds [cmds::new $vars]
 } -body {
   TestCmds $cmds {
-    markdown -directory [getvar fixturesDir]
+    markdown -directory [dir fixturesDir]
   }
 } -returnCodes {error} -result {markdown: can't use -directory without -file}
 
@@ -308,14 +308,14 @@ test markdown-6 {Detect missing command if set to "\t"} -setup {
     build [dict create \
       markdown [dict create \
         cmd "\t"
-      ]
-    ] \
-    fixturesDir $FixturesDir
+      ] \
+      dirs [list [list fixturesDir $FixturesDir r]] \
+    ]
   ]
   set cmds [cmds::new $vars]
 } -body {
   TestCmds $cmds {
-    markdown -directory [getvar fixturesDir] -file simple.md
+    markdown -directory [dir fixturesDir] -file simple.md
   }
 } -returnCodes {error} -result {markdown: no cmd set in build > markdown > cmd}
 
@@ -325,14 +325,14 @@ test markdown-7 {Detect missing command if set to " "} -setup {
     build [dict create \
       markdown [dict create \
         cmd " "
-      ]
-    ] \
-    fixturesDir $FixturesDir
+      ] \
+      dirs [list [list fixturesDir $FixturesDir r]] \
+    ]
   ]
   set cmds [cmds::new $vars]
 } -body {
   TestCmds $cmds {
-    markdown -directory [getvar fixturesDir] -file simple.md
+    markdown -directory [dir fixturesDir] -file simple.md
   }
 } -returnCodes {error} -result {markdown: no cmd set in build > markdown > cmd}
 
@@ -342,7 +342,25 @@ test markdown-8 {Detect errors from external markdown command} -setup {
     build [dict create \
       markdown [dict create \
         cmd "$MarkdownCmd hello"
-      ]
+      ] \
+      dirs [list [list fixturesDir $FixturesDir r]] \
+    ]
+  ]
+  set cmds [cmds::new $vars]
+} -body {
+  TestCmds $cmds {
+    markdown -directory [dir fixturesDir] -file simple.md
+  }
+} -returnCodes {error} -result "markdown: error from external command: $MarkdownCmd hello, wrong # args"
+
+
+test markdown-9 {Detect permission errors} -setup {
+  set vars [dict create \
+    build [dict create \
+      markdown [dict create \
+        cmd "$MarkdownCmd hello"
+      ] \
+      dirs [list [list here [pwd] r]] \
     ] \
     fixturesDir $FixturesDir
   ]
@@ -359,11 +377,10 @@ test ornament-1 {Detect errors when opening template file} -setup {
     build [dict create \
       dirs [list [list fixturesDir $FixturesDir r]] \
     ] \
-    fixturesDir $FixturesDir
   ]
   set cmds [cmds::new $vars]
 } -body {
   TestCmds $cmds {
-    ornament -directory [getvar fixturesDir] -file notexist.tpl
+    ornament -directory [dir fixturesDir] -file notexist.tpl
   }
 } -returnCodes {error} -result "ornament: couldn't open \"[file join $FixturesDir notexist.tpl]\": no such file or directory"

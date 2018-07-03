@@ -203,16 +203,24 @@ proc cmds::CmdMarkdown {vars int args} {
   if {[string trim $cmd " \t"] eq ""} {
     return -code error "markdown: no cmd set in build > markdown > cmd"
   }
-  try {
-    if {[llength $args] == 1} {
+  if {[llength $args] == 1} {
+    try {
       return [exec -- {*}$cmd << [lindex $args 0]]
-    } else {
-      set filename [file join $directory $filename]
-      return [exec -- {*}$cmd $filename]
+    } on error {result} {
+      return -code error \
+          "markdown: error from external command: $cmd, $result"
     }
-  } on error {result} {
-    return -code error \
-        "markdown: error from external command: $cmd, $result"
+  } else {
+    set filename [file join $directory $filename]
+    if {![checkPermissions $vars $filename r]} {
+      return -code error "markdown: permission denied for: $filename"
+    }
+    try {
+      return [exec -- {*}$cmd $filename]
+    } on error {result} {
+      return -code error \
+          "markdown: error from external command: $cmd, $result"
+    }
   }
 }
 
