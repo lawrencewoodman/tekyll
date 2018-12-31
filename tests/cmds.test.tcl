@@ -384,3 +384,28 @@ test ornament-1 {Detect errors when opening template file} -setup {
     ornament -directory [dir fixturesDir] -file notexist.tpl
   }
 } -returnCodes {error} -result "ornament: couldn't open \"[file join $FixturesDir notexist.tpl]\": no such file or directory"
+
+
+test ornament-2 {Process template properly} -setup {
+  set vars [dict create \
+    build [dict create \
+      dirs [list [list fixturesDir $FixturesDir r]] \
+    ] \
+  ]
+  set cmds [cmds::new $vars]
+} -body {
+  TestCmds $cmds {
+    set params {
+      posts {{a 7} {b 9} {c 10}} \
+      maxPosts 4 \
+    }
+    ornament -params $params -directory [dir fixturesDir] -file ornament.txt
+  }
+} -result {<div class="row">
+      hello this is ornament2.txt for post: 0, in here numPosts: 0
+      hello this is ornament2.txt for post: 1, in here numPosts: 0
+      hello this is ornament2.txt for post: 2, in here numPosts: 0
+</div>
+numPosts: 3}
+
+cleanupTests

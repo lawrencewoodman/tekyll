@@ -1,0 +1,13 @@
+!* commandSubst true variableSubst true
+<div class="row">
+!   set numPosts 0
+!   foreach post [getparam posts] {
+!     dict set post postNum $numPosts
+!     incr numPosts
+!     if {[getparam maxPosts] != 0 && $numPosts > [getparam maxPosts]} {
+!       break
+!     }
+      [ornament -params $post -directory [dir fixturesDir] -file ornament2.txt]
+!  }
+</div>
+numPosts: $numPosts

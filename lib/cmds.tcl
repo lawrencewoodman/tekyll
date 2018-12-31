@@ -3,6 +3,7 @@
 
 package require htmlparse
 package require cmdline
+package require ornament
 
 namespace eval cmds {
   namespace export {[a-z]*}
@@ -258,6 +259,9 @@ proc cmds::CmdOrnament {vars int args} {
     }
     try {
       set template [read $fp]
+      if {[string index $template end] == "\n"} {
+        set template [string range $template 0 end-1]
+      }
     } on error {result} {
       return -code error "ornament: error in $filename, $result"
     } finally {
@@ -268,8 +272,8 @@ proc cmds::CmdOrnament {vars int args} {
   }
   try {
     dict set vars params [dict get $parsed params]
-    set script [ornament compile $template]
     set cmds [new $vars]
+    set script [ornament compile $template]
     return [ornament run $script $cmds]
   } on error {result} {
     if {$filename ne ""} {

@@ -1,0 +1,3 @@
+!* commandSubst true variableSubst true
+!  set numPosts 0
+hello this is ornament2.txt for post: [getparam postNum], in here numPosts: $numPosts

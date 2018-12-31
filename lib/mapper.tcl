@@ -1,8 +1,6 @@
 # Copyright (C) 2018 Lawrence Woodman <lwoodman@vlifesystems.com>
 # Licensed under an MIT licence.  Please see LICENCE.md for details.
 
-package require ornament
-
 namespace eval mapper {
   namespace export {[a-z]*}
   namespace ensemble create
