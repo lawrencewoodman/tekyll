@@ -15,7 +15,7 @@ install:
   - git clone https://github.com/lawrencewoodman/installmodule_tcl
   # Install Tcl ornament module
   - git clone https://github.com/lawrencewoodman/ornament_tcl
-  - tclsh installmodule_tcl/installmodule.tcl ornament_tcl ornament-*.tm
+  - sudo tclsh installmodule_tcl/installmodule.tcl ornament_tcl/ornament-*.tm
 
 script:
   # Run the tests
