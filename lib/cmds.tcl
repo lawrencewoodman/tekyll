@@ -292,7 +292,6 @@ proc cmds::CmdGetVar {vars int args} {
   set usage ": getvar \[options] key ?key ..?\noptions:"
   set parsed [::cmdline::getoptions args $options $usage]
 
-  # TODO: only allow file and site vars
   if {[dict exists $vars {*}$args]} {
     return [dict get $vars {*}$args]
   }
