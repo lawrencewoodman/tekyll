@@ -1,3 +1,6 @@
+# Copyright (C) 2018 Lawrence Woodman <lwoodman@vlifesystems.com>
+# Licensed under an MIT licence.  Please see LICENCE.md for details.
+
 # wantPermissions is a string
 # Returns true if wanted permissions all found, otherwise false
 proc checkPermissions {vars path wantPermissions} {
