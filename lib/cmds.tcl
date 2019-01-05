@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Lawrence Woodman <lwoodman@vlifesystems.com>
+# Copyright (C) 2018-2019 Lawrence Woodman <lwoodman@vlifesystems.com>
 # Licensed under an MIT licence.  Please see LICENCE.md for details.
 
 package require htmlparse
@@ -197,19 +197,11 @@ proc cmds::CmdMarkdown {vars int args} {
       return -code error "markdown: wrong # args"
   }
 
-  set cmd [dict get $vars build markdown cmd]
-
-  # Check cmd isn't blank.  This is a security check to stop the file
-  # being executed instead of the markdown command.
-  if {[string trim $cmd " \t"] eq ""} {
-    return -code error "markdown: no cmd set in build > markdown > cmd"
-  }
   if {[llength $args] == 1} {
     try {
-      return [exec -- {*}$cmd << [lindex $args 0]]
+      return [markdown render [lindex $args 0]]
     } on error {result} {
-      return -code error \
-          "markdown: error from external command: $cmd, $result"
+      return -code error "markdown: $result"
     }
   } else {
     set filename [file join $directory $filename]
@@ -217,10 +209,9 @@ proc cmds::CmdMarkdown {vars int args} {
       return -code error "markdown: permission denied for: $filename"
     }
     try {
-      return [exec -- {*}$cmd $filename]
+      return [markdown renderFile $filename]
     } on error {result} {
-      return -code error \
-          "markdown: error from external command: $cmd, $result"
+      return -code error "markdown: $result"
     }
   }
 }

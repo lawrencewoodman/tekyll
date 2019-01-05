@@ -4,9 +4,10 @@ namespace import tcltest::*
 
 set ThisScriptDir [file dirname [info script]]
 set LibDir [file join $ThisScriptDir .. lib]
-set UtilsDir [file normalize [file join $ThisScriptDir utils]]
+set DummyDir [file normalize [file join $ThisScriptDir dummy]]
 set FixturesDir [file normalize [file join $ThisScriptDir fixtures]]
 
+source [file join $LibDir "markdown.tcl"]
 source [file join $LibDir "misc.tcl"]
 source [file join $LibDir "cmds.tcl"]
 
@@ -22,9 +23,6 @@ proc TestCmds {cmds body} {
     interp delete $safeInterp
   }
 }
-
-set MarkdownCmd [list tclsh [file join $UtilsDir markdown.tcl]]
-
 
 test collection-1 {Return error if subcommand} -setup {
   set vars {}
@@ -208,14 +206,7 @@ test getparam-6 {Don't return an error if -noerror set} -setup {
 
 
 test markdown-1 {Process text passed to it} -setup {
-  set vars [dict create \
-    build [dict create \
-      markdown [dict create \
-        cmd $MarkdownCmd
-      ]
-    ]
-  ]
-  set cmds [cmds::new $vars]
+  set cmds [cmds::new]
   set body {
     set text {
 # This is a title
@@ -227,16 +218,12 @@ This is a new paragraph.
 } -body {
   TestCmds $cmds $body
 } -result {<h1>This is a title</h1>
-
 <p>This is a new paragraph.</p>}
 
 
 test markdown-2 {Process a file without -directory} -setup {
   set vars [dict create \
     build [dict create \
-      markdown [dict create \
-        cmd $MarkdownCmd
-      ] \
       dirs [list [list fixturesDir $FixturesDir r]] \
     ]
   ]
@@ -246,16 +233,12 @@ test markdown-2 {Process a file without -directory} -setup {
     markdown -file [file join [dir fixturesDir] simple.md]
   }
 } -result {<h1>This is a title</h1>
-
 <p>This is a new paragraph.</p>}
 
 
 test markdown-3 {Process a file with -directory} -setup {
   set vars [dict create \
     build [dict create \
-      markdown [dict create \
-        cmd $MarkdownCmd
-      ] \
       dirs [list [list fixturesDir $FixturesDir r]] \
     ]
   ]
@@ -265,16 +248,12 @@ test markdown-3 {Process a file with -directory} -setup {
     markdown -directory [dir fixturesDir] -file simple.md
   }
 } -result {<h1>This is a title</h1>
-
 <p>This is a new paragraph.</p>}
 
 
 test markdown-4 {Wrong number of arguments with -file} -setup {
   set vars [dict create \
     build [dict create \
-      markdown [dict create \
-        cmd $MarkdownCmd
-      ] \
       dirs [list [list fixturesDir $FixturesDir r]] \
     ]
   ]
@@ -289,9 +268,6 @@ test markdown-4 {Wrong number of arguments with -file} -setup {
 test markdown-5 {Can't use -directory without -file} -setup {
   set vars [dict create \
     build [dict create \
-      markdown [dict create \
-        cmd $MarkdownCmd
-      ] \
       dirs [list [list fixturesDir $FixturesDir r]] \
     ]
   ]
@@ -303,64 +279,32 @@ test markdown-5 {Can't use -directory without -file} -setup {
 } -returnCodes {error} -result {markdown: can't use -directory without -file}
 
 
-test markdown-6 {Detect missing command if set to "\t"} -setup {
+test markdown-6 {Detect errors from external markdown command} -setup {
   set vars [dict create \
     build [dict create \
-      markdown [dict create \
-        cmd "\t"
-      ] \
       dirs [list [list fixturesDir $FixturesDir r]] \
     ]
   ]
   set cmds [cmds::new $vars]
+  set OLD_MARKDOWN_CMD $markdown::MARKDOWN_CMD
+  set markdown::MARKDOWN_CMD "cmark-gfm -nnnnnn"
 } -body {
   TestCmds $cmds {
-    markdown -directory [dir fixturesDir] -file simple.md
+    try {
+      markdown -directory [dir fixturesDir] -file simple.md
+    } on error {result} {
+      return -code error [lrange [lindex [split $result "\n"] 0] 0 8]
+    }
   }
-} -returnCodes {error} -result {markdown: no cmd set in build > markdown > cmd}
+} -cleanup {
+  set markdown::MARKDOWN_CMD $OLD_MARKDOWN_CMD
+} -returnCodes {error} -result "markdown: error from external command: cmark-gfm -nnnnnn, Usage: cmark-gfm"
 
 
-test markdown-7 {Detect missing command if set to " "} -setup {
+test markdown-7 {Detect permission errors} -setup {
   set vars [dict create \
     build [dict create \
-      markdown [dict create \
-        cmd " "
-      ] \
-      dirs [list [list fixturesDir $FixturesDir r]] \
-    ]
-  ]
-  set cmds [cmds::new $vars]
-} -body {
-  TestCmds $cmds {
-    markdown -directory [dir fixturesDir] -file simple.md
-  }
-} -returnCodes {error} -result {markdown: no cmd set in build > markdown > cmd}
-
-
-test markdown-8 {Detect errors from external markdown command} -setup {
-  set vars [dict create \
-    build [dict create \
-      markdown [dict create \
-        cmd "$MarkdownCmd hello"
-      ] \
-      dirs [list [list fixturesDir $FixturesDir r]] \
-    ]
-  ]
-  set cmds [cmds::new $vars]
-} -body {
-  TestCmds $cmds {
-    markdown -directory [dir fixturesDir] -file simple.md
-  }
-} -returnCodes {error} -result "markdown: error from external command: $MarkdownCmd hello, wrong # args"
-
-
-test markdown-9 {Detect permission errors} -setup {
-  set vars [dict create \
-    build [dict create \
-      markdown [dict create \
-        cmd "$MarkdownCmd hello"
-      ] \
-      dirs [list [list here [pwd] r]] \
+      dirs [list [list testsDummy $DummyDir r]] \
     ] \
     fixturesDir $FixturesDir
   ]
@@ -369,7 +313,7 @@ test markdown-9 {Detect permission errors} -setup {
   TestCmds $cmds {
     markdown -directory [getvar fixturesDir] -file simple.md
   }
-} -returnCodes {error} -result "markdown: error from external command: $MarkdownCmd hello, wrong # args"
+} -returnCodes {error} -result "markdown: permission denied for: [file join $FixturesDir simple.md]"
 
 
 test ornament-1 {Detect errors when opening template file} -setup {

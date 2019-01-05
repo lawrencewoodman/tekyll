@@ -8,6 +8,7 @@ set ThisScriptDir [file dirname [info script]]
 set LibDir [file join $ThisScriptDir lib]
 source [file join $LibDir mapper.tcl]
 source [file join $LibDir misc.tcl]
+source [file join $LibDir markdown.tcl]
 source [file join $LibDir cmds.tcl]
 #>! }
 #>!* commandSubst true

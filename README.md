@@ -11,6 +11,7 @@ Requirements
 ------------
 *  Tcl 8.6+
 *  [ornament](https://github.com/lawrencewoodman/ornament_tcl)
+*  [cmark-gfm](https://github.com/github/cmark-gfm)
 
 Contributing
 ------------
@@ -26,6 +27,6 @@ If you find a bug, please report it at the project's [issues tracker](https://gi
 
 Licence
 -------
-Copyright (C) 2018 Lawrence Woodman <lwoodman@vlifesystems.com>
+Copyright (C) 2018-2019 Lawrence Woodman <lwoodman@vlifesystems.com>
 
 This software is licensed under an MIT Licence.  Please see the file, [LICENCE.md](https://github.com/lawrencewoodman/tekyll/blob/master/LICENCE.md), for details.
