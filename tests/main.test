@@ -45,8 +45,10 @@ test main-1 {Return error if subcommand} -setup {
   $interpA eval [list source [file join $RootDir main.tcl]]
   cd $tempDirB
   $interpB eval [list source [file join $tempDirA build tekyll.tcl]]
-  expr {[::sha2::sha256 -file [file join $tempDirA build tekyll.tcl]] ==
-        [::sha2::sha256 -file [file join $tempDirB build tekyll.tcl]]}
+  expr {([::sha2::sha256 -file [file join $tempDirA build tekyll.tcl]] ==
+         [::sha2::sha256 -file [file join $tempDirB build tekyll.tcl]]) &&
+        ([file size [file join $tempDirA build tekyll.tcl]] >
+         [file size [file join $RootDir main.tcl]])}
 } -cleanup {
   cd $startDir
   file delete -force $tempDirA
