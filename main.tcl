@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Lawrence Woodman <lwoodman@vlifesystems.com>
+# Copyright (C) 2018-2019 Lawrence Woodman <lwoodman@vlifesystems.com>
 # Licensed under an MIT licence.  Please see LICENCE.md for details.
 
 package require fileutil::traverse
@@ -17,22 +17,33 @@ source [file join $LibDir cmds.tcl]
 #>[read -directory [dir lib] cmds.tcl]
 #>!* commandSubst false
 
-# Load vars
-set fp [open tekyll.cfg r]
-set script [ornament compile [read $fp]]
-set cmds [cmds::new]
-set vars [ornament run $script $cmds]
-close $fp
 
-set contentWalker [::fileutil::traverse %AUTO% [getDir $vars init]]
+proc loadVars {} {
+  set fp [open tekyll.cfg r]
+  set script [ornament compile [read $fp]]
+  set cmds [cmds::new]
+  set vars [ornament run $script $cmds]
+  close $fp
+  return $vars
+}
 
-$contentWalker foreach file {
-  if {[file isfile $file]} {
-    lappend files $file
+proc getInitFiles {vars} {
+  set contentWalker [::fileutil::traverse %AUTO% [getDir $vars init]]
+  $contentWalker foreach file {
+    if {[file isfile $file]} {
+      lappend files $file
+    }
+  }
+  return $files
+}
+
+proc processInitFiles {vars files} {
+  set files [lsort $files]
+  foreach file $files {
+    mapper process $file $vars
   }
 }
 
-set files [lsort $files]
-foreach file $files {
-  mapper process $file $vars
-}
+set vars [loadVars]
+set initFiles [getInitFiles $vars]
+processInitFiles $vars $initFiles
