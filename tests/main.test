@@ -30,7 +30,7 @@ proc makeTekyllCfg {tempDir} {
 }
 
 
-test main-1 {Return error if subcommand} -setup {
+test main-1 {Ensure that single script created by tekyll gives same output as base multiple script version} -setup {
   set startDir [pwd]
   set tempDirA [::fileutil::maketempdir]
   set tempDirB [::fileutil::maketempdir]
