@@ -19,4 +19,4 @@ install:
 
 script:
   # Run the tests
-  - tclsh tests/*.test.tcl
+  - tclsh tests/all.tcl

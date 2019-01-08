@@ -52,3 +52,5 @@ test main-1 {Return error if subcommand} -setup {
   file delete -force $tempDirA
   file delete -force $tempDirB
 } -result {1}
+
+cleanupTests
