@@ -3,6 +3,9 @@
 
 package require fileutil::traverse
 
+# The lines beginning '#>' will have the '#>' removed if processed by
+# tekyll to create a single file, so that those lines can instruct
+# ornament what to do.
 #>! if 0 {
 set ThisScriptDir [file dirname [info script]]
 set LibDir [file join $ThisScriptDir lib]
