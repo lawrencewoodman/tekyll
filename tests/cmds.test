@@ -138,9 +138,10 @@ test getparam-2 {Return default if -default set and can't find key} -setup {
   TestCmds $cmds {
     list [getparam name] is [getparam -default {} name] and \
          [getparam -default bob name] is known as \
-         [getparam -default harry nickname]
+         [getparam -default harry nickname] \
+         ![getparam -default {} title]!
   }
-} -result [list fred is fred and fred is known as harry]
+} -result {fred is fred and fred is known as harry !!}
 
 
 test getparam-3 {Return all params if no key passed} -setup {
@@ -173,36 +174,64 @@ test getparam-4 {Return error if key doesn't exist} -setup {
 } -returnCodes {error} -result {getparam: unknown key: status}
 
 
-test getparam-5 {Return error if key doesn't exist and -default set to {}} -setup {
-  set vars [dict create \
-    params [dict create \
-      name fred \
-      age 27 \
-    ]
-  ]
+test getvar-1 {Return the correct value for key from vars} -setup {
+  set vars {
+    name fred
+    age 27
+    status {
+      first ready
+      second go
+    }
+  }
   set cmds [cmds::new $vars]
 } -body {
   TestCmds $cmds {
-    getparam -default {} status
+    list [getvar name] is [getvar age] [getvar status second]
   }
-} -returnCodes {error} -result {getparam: unknown key: status}
+} -result {fred is 27 go}
 
 
-test getparam-6 {Don't return an error if -noerror set} -setup {
-  set vars [dict create \
-    params [dict create \
-      name fred \
-      age 27 \
-    ]
-  ]
+test getvar-2 {Return default if -default set and can't find key} -setup {
+  set vars {
+    name fred
+    age 27
+  }
   set cmds [cmds::new $vars]
 } -body {
   TestCmds $cmds {
-    list "status: [getparam -noerror -default {} status]" \
-         "status: [getparam -noerror status]" \
-         "status: [getparam -noerror -default ready status]"
+    list [getvar name] is [getvar -default {} name] and \
+         [getvar -default bob name] is known as \
+         [getvar -default harry nickname] \
+         ![getvar -default {} title]!
   }
-} -result {{status: } {status: } {status: ready}}
+} -result {fred is fred and fred is known as harry !!}
+
+
+test getvar-3 {Return error if no key passed} -setup {
+  set vars {
+    name fred
+    age 27
+  }
+  set cmds [cmds::new $vars]
+} -body {
+  TestCmds $cmds {
+    getvar
+  }
+} -returnCodes {error} -result {getvar: invalid number of arguments}
+
+
+test getvar-4 {Return error if key doesn't exist} -setup {
+  set vars {
+    name fred
+    age 27
+  }
+  set cmds [cmds::new $vars]
+} -body {
+  TestCmds $cmds {
+    getvar status
+  }
+} -returnCodes {error} -result {getvar: unknown key: status}
+
 
 
 test log-1 {Outputs info message to stdout with timestamp} -setup {

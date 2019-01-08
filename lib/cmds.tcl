@@ -279,37 +279,45 @@ proc cmds::CmdOrnament {vars int args} {
 }
 
 proc cmds::CmdGetVar {vars int args} {
-  set options {
-    {noerror {Don't return error if key not found}}
-    {default.arg {} {What to default to in case var doesn't exist}}
+  array set options {}
+  while {[llength $args]} {
+    switch -glob -- [lindex $args 0] {
+      -default {set args [lassign $args - options(default)]}
+      --      {set args [lrange $args 1 end] ; break}
+      -*      {error "getvar: unknown option [lindex $args 0]"}
+      default break
+    }
   }
-  set usage ": getvar \[options] key ?key ..?\noptions:"
-  set parsed [::cmdline::getoptions args $options $usage]
+  if {[llength $args] == 0} {
+    return -code error "getvar: invalid number of arguments"
+  }
 
   if {[dict exists $vars {*}$args]} {
     return [dict get $vars {*}$args]
   }
-  if {![dict get $parsed noerror]} {
-    return -code error "getvar: key doesn't exist: $args"
+  if {[info exists options(default)]} {
+    return $options(default)
   }
-  return [dict get $parsed default]
+  return -code error "getvar: unknown key: $args"
 }
 
 proc cmds::CmdGetParam {vars int args} {
-  set options {
-    {noerror {Don't return error if key not found}}
-    {default.arg {} {What to default to in case var doesn't exist}}
+  array set options {}
+  while {[llength $args]} {
+    switch -glob -- [lindex $args 0] {
+      -default {set args [lassign $args - options(default)]}
+      --      {set args [lrange $args 1 end] ; break}
+      -*      {error "getparam: unknown option [lindex $args 0]"}
+      default break
+    }
   }
-  set usage ": getparam \[options] key ?key ..?\noptions:"
-  set parsed [::cmdline::getoptions args $options $usage]
-
   if {[dict exists $vars params {*}$args]} {
     return [dict get $vars params {*}$args]
   }
-  if {![dict get $parsed noerror] && [dict get $parsed default] eq ""} {
-    return -code error "getparam: unknown key: $args"
+  if {[info exists options(default)]} {
+    return $options(default)
   }
-  return [dict get $parsed default]
+  return -code error "getparam: unknown key: $args"
 }
 
 proc cmds::CmdRead {vars int args} {
