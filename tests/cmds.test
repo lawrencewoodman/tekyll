@@ -205,6 +205,37 @@ test getparam-6 {Don't return an error if -noerror set} -setup {
 } -result {{status: } {status: } {status: ready}}
 
 
+test log-1 {Outputs info message to stdout with timestamp} -setup {
+  set cmds [cmds::new]
+} -body {
+  TestCmds $cmds {
+    log info "hello this is some info"
+  }
+} -match regexp \
+-output "^\\d\\d\\d\\d-\\d\\d-\\d\\d      info  hello this is some info\n$"
+
+
+test log-2 {Outputs warning message to stdout with timestamp} -setup {
+  set cmds [cmds::new]
+} -body {
+  TestCmds $cmds {
+    log warning "hello this is a warning"
+  }
+} -match regexp \
+-output "^\\d\\d\\d\\d-\\d\\d-\\d\\d   warning  hello this is a warning\n$"
+
+
+
+test log-3 {Outputs error message to stderr with timestamp} -setup {
+  set cmds [cmds::new]
+} -body {
+  TestCmds $cmds {
+    log error "hello this is an error"
+  }
+} -match regexp \
+-errorOutput "^\\d\\d\\d\\d-\\d\\d-\\d\\d     error  hello this is an error\n$"
+
+
 test markdown-1 {Process text passed to it} -setup {
   set cmds [cmds::new]
   set body {

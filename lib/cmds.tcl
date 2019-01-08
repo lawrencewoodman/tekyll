@@ -161,9 +161,12 @@ proc cmds::CmdLog {int level msg} {
   if {[lsearch $validLevels $level] == -1} {
     return -code error "log: unknown level: $level"
   }
-  # TODO: Work out whether should log to stderr or stdout
+  set channelID stdout
   set timeStamp [clock format [clock seconds] -format {%Y-%m-%d}]
-  puts [format "%s  %8s  %s" $timeStamp $level $msg]
+  if {$level eq "error"} {
+    set channelID stderr
+  }
+  puts $channelID [format "%s  %8s  %s" $timeStamp $level $msg]
 }
 
 proc cmds::collectText {varName args} {
