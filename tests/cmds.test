@@ -108,17 +108,9 @@ test dir-2 {Return error if can't find shortName} -setup {
 
 
 test getparam-1 {Return the correct value for key from params} -setup {
-  set vars {
-    params {
-      name fred
-      age 27
-      status {
-        first ready
-        second go
-      }
-    }
-  }
-  set cmds [cmds::new $vars]
+  set vars {build here}
+  set params {name fred age 27 status {first ready second go}}
+  set cmds [cmds::new $vars $params]
 } -body {
   TestCmds $cmds {
     list [getparam name] is [getparam age] [getparam status second]
@@ -127,13 +119,9 @@ test getparam-1 {Return the correct value for key from params} -setup {
 
 
 test getparam-2 {Return default if -default set and can't find key} -setup {
-  set vars {
-    params {
-      name fred
-      age 27
-    }
-  }
-  set cmds [cmds::new $vars]
+  set vars {build here}
+  set params {name fred age 27}
+  set cmds [cmds::new $vars $params]
 } -body {
   TestCmds $cmds {
     list [getparam name] is [getparam -default {} name] and \
@@ -145,13 +133,9 @@ test getparam-2 {Return default if -default set and can't find key} -setup {
 
 
 test getparam-3 {Return all params if no key passed} -setup {
-  set vars [dict create \
-    params [dict create \
-      name fred \
-      age 27 \
-    ]
-  ]
-  set cmds [cmds::new $vars]
+  set vars {build here}
+  set params {name fred age 27}
+  set cmds [cmds::new $vars $params]
 } -body {
   TestCmds $cmds {
     getparam
@@ -160,13 +144,9 @@ test getparam-3 {Return all params if no key passed} -setup {
 
 
 test getparam-4 {Return error if key doesn't exist} -setup {
-  set vars [dict create \
-    params [dict create \
-      name fred \
-      age 27 \
-    ]
-  ]
-  set cmds [cmds::new $vars]
+  set vars {build here}
+  set params {name fred age 27}
+  set cmds [cmds::new $vars $params]
 } -body {
   TestCmds $cmds {
     getparam status

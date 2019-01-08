@@ -11,12 +11,12 @@ namespace eval cmds {
   variable collections [dict create]
 }
 
-proc cmds::new {{vars {}}} {
+proc cmds::new {{vars {}} {params {}}} {
   set cmds [dict create \
     collection [namespace which CmdCollection] \
     dir [list [namespace which CmdDir] $vars] \
     getvar [list [namespace which CmdGetVar] $vars] \
-    getparam [list [namespace which CmdGetParam] $vars] \
+    getparam [list [namespace which CmdGetParam] $params] \
     log [namespace which CmdLog] \
     markdown [list [namespace which CmdMarkdown] $vars] \
     ornament [list [namespace which CmdOrnament] $vars] \
@@ -265,8 +265,8 @@ proc cmds::CmdOrnament {vars int args} {
     set template [lindex $args 0]
   }
   try {
-    dict set vars params [dict get $parsed params]
-    set cmds [new $vars]
+    set params [dict get $parsed params]
+    set cmds [new $vars $params]
     set script [ornament compile $template]
     return [ornament run $script $cmds]
   } on error {result} {
@@ -301,7 +301,7 @@ proc cmds::CmdGetVar {vars int args} {
   return -code error "getvar: unknown key: $args"
 }
 
-proc cmds::CmdGetParam {vars int args} {
+proc cmds::CmdGetParam {params int args} {
   array set options {}
   while {[llength $args]} {
     switch -glob -- [lindex $args 0] {
@@ -311,8 +311,11 @@ proc cmds::CmdGetParam {vars int args} {
       default break
     }
   }
-  if {[dict exists $vars params {*}$args]} {
-    return [dict get $vars params {*}$args]
+  if {[llength $args] == 0} {
+    return $params
+  }
+  if {[dict exists $params {*}$args]} {
+    return [dict get $params {*}$args]
   }
   if {[info exists options(default)]} {
     return $options(default)
