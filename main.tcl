@@ -9,13 +9,13 @@ package require fileutil::traverse
 #>! if 0 {
 set ThisScriptDir [file dirname [info script]]
 set LibDir [file join $ThisScriptDir lib]
-source [file join $LibDir mapper.tcl]
+source [file join $LibDir init.tcl]
 source [file join $LibDir misc.tcl]
 source [file join $LibDir markdown.tcl]
 source [file join $LibDir cmds.tcl]
 #>! }
 #>!* commandSubst true
-#>[read -directory [dir lib] mapper.tcl]
+#>[read -directory [dir lib] init.tcl]
 #>[read -directory [dir lib] misc.tcl]
 #>[read -directory [dir lib] cmds.tcl]
 #>!* commandSubst false
@@ -43,7 +43,7 @@ proc getInitFiles {vars} {
 proc processInitFiles {vars files} {
   set files [lsort $files]
   foreach file $files {
-    mapper process $file $vars
+    init::process $file $vars
   }
 }
 
