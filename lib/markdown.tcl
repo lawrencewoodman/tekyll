@@ -5,7 +5,7 @@ namespace eval markdown {
   namespace export {[a-z]*}
   namespace ensemble create
 
-  variable MARKDOWN_CMD "cmark-gfm"
+  variable MARKDOWN_CMD "cmark-gfm --unsafe"
 }
 
 proc markdown::render {text} {
