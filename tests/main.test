@@ -7,18 +7,20 @@ namespace import tcltest::*
 set ThisScriptDir [file dirname [info script]]
 set RootDir [file normalize [file join $ThisScriptDir ..]]
 set LibDir [file join $RootDir lib]
+set VendorDir [file join $RootDir vendor]
 set InitDir [file join $RootDir init]
 set DummyDir [file normalize [file join $ThisScriptDir dummy]]
 set FixturesDir [file normalize [file join $ThisScriptDir fixtures]]
 
 
 proc makeTekyllCfg {tempDir} {
-  global LibDir InitDir RootDir
+  global LibDir VendorDir InitDir RootDir
   set tekyllCfg [dict create build \
     [dict create dirs \
       [list \
         [list build build w] \
         [list lib $LibDir r] \
+        [list vendor $VendorDir r] \
         [list init $InitDir r] \
         [list root $RootDir r] \
       ]
@@ -40,10 +42,20 @@ test main-1 {Ensure that single script created by tekyll gives same output as ba
   makeTekyllCfg $tempDirB
   set interpA [interp create]
   set interpB [interp create]
+  set initScript {
+    set argv {}
+    rename ::puts OldPuts
+    proc puts {args} {
+      if {[llength $args] == 1} {return}
+      OldPuts {*}$args
+    }
+  }
 } -body {
   cd $tempDirA
+  $interpA eval $initScript
   $interpA eval [list source [file join $RootDir main.tcl]]
   cd $tempDirB
+  $interpB eval $initScript
   $interpB eval [list source [file join $tempDirA build tekyll.tcl]]
   expr {([::sha2::sha256 -file [file join $tempDirA build tekyll.tcl]] ==
          [::sha2::sha256 -file [file join $tempDirB build tekyll.tcl]]) &&
@@ -54,5 +66,6 @@ test main-1 {Ensure that single script created by tekyll gives same output as ba
   file delete -force $tempDirA
   file delete -force $tempDirB
 } -result {1}
+
 
 cleanupTests

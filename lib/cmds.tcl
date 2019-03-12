@@ -22,6 +22,7 @@ proc cmds::new {{vars {}} {params {}}} {
     ornament [list [namespace which CmdOrnament] $vars] \
     source [list [namespace which CmdSource] $vars]\
     read [list [namespace which CmdRead] $vars] \
+    test [namespace which CmdDummy] \
     strip_html [namespace which CmdStripHTML] \
     file [list [namespace which CmdFile] $vars] \
     glob [namespace which CmdGlob] \
@@ -70,6 +71,12 @@ proc cmds::CmdDir {vars int shortName args} {
   } on error {result} {
     return -code error "dir: $result"
   }
+}
+
+
+# This is just used so that other commands such as the test commands
+# can be loaded later
+proc cmds::CmdDummy {int args} {
 }
 
 

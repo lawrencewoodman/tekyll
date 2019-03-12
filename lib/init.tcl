@@ -8,7 +8,7 @@ namespace eval init {
 proc init::process {file vars} {
   set cmds [::cmds::new $vars]
   if {![checkPermissions $vars $file r]} {
-    return -code error "error processing: $file, permission denied"
+    return -code error "permission denied for: $file"
   }
   puts "Processing: $file"
   set safeInterp [interp create -safe]

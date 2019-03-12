@@ -1,0 +1,79 @@
+package require Tcl 8.6
+package require tcltest
+namespace import tcltest::*
+
+set ThisScriptDir [file dirname [info script]]
+set LibDir [file join $ThisScriptDir .. lib]
+set VendorDir [file join $ThisScriptDir .. vendor]
+set DummyDir [file normalize [file join $ThisScriptDir dummy]]
+set FixturesDir [file normalize [file join $ThisScriptDir fixtures]]
+
+source [file join $VendorDir "xproc-0.1.tm"]
+source [file join $LibDir "misc.tcl"]
+source [file join $LibDir "cmds.tcl"]
+source [file join $LibDir "channelmonitor.tcl"]
+source [file join $LibDir "test.tcl"]
+
+
+test runTests-1 {Check failing test output} -setup {
+  set vars [dict create \
+    build [dict create \
+      dirs [list \
+        [list plugins [file join $FixturesDir plugins] r]
+      ]
+    ]
+  ]
+  set filename [file join $FixturesDir plugins adder.tcl]
+} -body {
+  test::runTests $filename $vars
+} -match regexp -output {Testing: .*fixtures.plugins.adder.tcl
+--- FAIL  ::adder::add5\/2 \(0.00s\)
+          \(2\) got: 14, want: 11
+--- FAIL  ::adder::add5\/3 \(0.00s\)
+          just want to fail
+
+Total: 3,  Passed: 1,  Skipped: 0,  Failed: 2
+$} -result false
+
+
+test runTests-2 {Check passing test output} -setup {
+  set vars [dict create \
+    build [dict create \
+      dirs [list \
+        [list plugins [file join $FixturesDir plugins] r]
+      ]
+    ]
+  ]
+  set filename [file join $FixturesDir plugins subtractor.tcl]
+} -body {
+  test::runTests $filename $vars
+} -match regexp -output {Testing: .*fixtures.plugins.subtractor.tcl
+$} -result true
+
+
+test runTests-3 {Check permission problem} -setup {
+  set vars {build {dirs {}}}
+  set filename [file join $FixturesDir plugins subtractor.tcl]
+} -body {
+  test::runTests $filename $vars
+} -match regexp \
+-result {permission denied for: .*fixtures.plugins.subtractor.tcl$} \
+-returnCodes {error}
+
+
+test runTests-4 {Check load error} -setup {
+  set vars [dict create \
+    build [dict create \
+      dirs [list \
+        [list plugins [file join $FixturesDir plugins] r]
+      ]
+    ]
+  ]
+  set filename [file join $FixturesDir plugins notexist.tcl]
+} -body {
+  test::runTests $filename $vars
+} -match regexp \
+-result {.*open.*fixtures.plugins.notexist.tcl.* for: .*fixtures.plugins.notexist.tcl$} -returnCodes {error}
+
+
+cleanupTests
