@@ -3,6 +3,7 @@ addons:
   apt:
     packages:
       - tcl
+      - cmark-gfm
 
 install:
   # Install tcllib
