@@ -3,7 +3,7 @@ tekyll
 
 [![Build Status](https://travis-ci.org/lawrencewoodman/tekyll.svg?branch=master)](https://travis-ci.org/lawrencewoodman/tekyll)
 
-A structured filed generator
+A structured file generator
 
 This generator allows you to script the generation of files.  It is typically used for the geneation of static websites.
 
