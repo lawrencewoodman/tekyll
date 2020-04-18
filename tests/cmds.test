@@ -338,7 +338,9 @@ test markdown-6 {Detect errors from external markdown command} -setup {
   }
 } -cleanup {
   set markdown::MARKDOWN_CMD $OLD_MARKDOWN_CMD
-} -returnCodes {error} -result "markdown: error from external command: cmark-gfm -nnnnnn, Usage: cmark-gfm"
+} -returnCodes {error} \
+-match glob \
+-result "markdown: error from external command: cmark-gfm -nnnnnn, Usage: cmark*"
 
 
 test markdown-7 {Detect permission errors} -setup {

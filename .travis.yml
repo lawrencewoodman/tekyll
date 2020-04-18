@@ -3,9 +3,12 @@ addons:
   apt:
     packages:
       - tcl
+      - cmark
 
 before_install:
-  - sudo apt-get -y install cmark-gfm
+  - pwd
+  - echo $PATH
+  - ln -s /usr/bin/cmark ~/bin/cmark-gfm
 
 install:
   # Install tcllib
