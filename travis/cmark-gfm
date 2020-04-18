@@ -1,0 +1,12 @@
+#!/usr/bin/env tclsh
+# Fake cmark-gfm for testing as it isn't easy to install cmark-gfm
+# on travis-ci.
+
+
+set mdArgs [list]
+foreach arg $argv {
+  if {$arg ne "--unsafe"} {lappend mdArgs $arg}
+}
+
+exec -- /usr/bin/markdown {*}$mdArgs <@stdin >@stdout 2>@stderr
+exit 0

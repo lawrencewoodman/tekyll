@@ -6,9 +6,8 @@ addons:
       - markdown
 
 before_install:
-  - pwd
-  - echo $PATH
-  - ln -s /usr/bin/markdown ~/bin/cmark-gfm
+  - cp travis/cmark-gfm ~/bin/cmark-gfm
+  - chmod +x ~/bin/cmark-cfm
 
 install:
   # Install tcllib
