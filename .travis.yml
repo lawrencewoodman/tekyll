@@ -6,6 +6,7 @@ addons:
       - markdown
 
 before_install:
+  - pwd
   - cp travis/cmark-gfm ~/bin/cmark-gfm
   - chmod +x ~/bin/cmark-cfm
 
