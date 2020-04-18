@@ -3,12 +3,12 @@ addons:
   apt:
     packages:
       - tcl
-      - cmark
+      - markdown
 
 before_install:
   - pwd
   - echo $PATH
-  - ln -s /usr/bin/cmark ~/bin/cmark-gfm
+  - ln -s /usr/bin/markdown ~/bin/cmark-gfm
 
 install:
   # Install tcllib
