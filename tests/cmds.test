@@ -248,7 +248,7 @@ test log-3 {Outputs error message to stderr with timestamp} -setup {
 test markdown-1 {Process text passed to it} -setup {
   set cmds [cmds::new]
   set body {
-    set text {
+  set text {
 # This is a title
 
 This is a new paragraph.
