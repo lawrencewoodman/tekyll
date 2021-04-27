@@ -1,5 +1,5 @@
 #!/usr/bin/env tclsh
-# Fake cmark-gfm for testing as it isn't easy to install cmark-gfm
+# Fake cmark for testing as it isn't easy to install cmark
 # on travis-ci.
 
 
@@ -7,7 +7,7 @@ set mdArgs [list]
 foreach arg $argv {
   if {$arg ne "--unsafe"} {lappend mdArgs $arg}
   if {$arg eq "-nnnnnn"} {
-    puts stderr "Usage: cmark-gfm"
+    puts stderr "Usage: cmark"
     exit 1
   }
 }

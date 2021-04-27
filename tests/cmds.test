@@ -327,7 +327,7 @@ test markdown-6 {Detect errors from external markdown command} -setup {
   ]
   set cmds [cmds::new $vars]
   set OLD_MARKDOWN_CMD $markdown::MARKDOWN_CMD
-  set markdown::MARKDOWN_CMD "cmark-gfm -nnnnnn"
+  set markdown::MARKDOWN_CMD "cmark -nnnnnn"
 } -body {
   TestCmds $cmds {
     try {
@@ -340,7 +340,7 @@ test markdown-6 {Detect errors from external markdown command} -setup {
   set markdown::MARKDOWN_CMD $OLD_MARKDOWN_CMD
 } -returnCodes {error} \
 -match glob \
--result "markdown: error from external command: cmark-gfm -nnnnnn, Usage: cmark*"
+-result "markdown: error from external command: cmark -nnnnnn, Usage: cmark*"
 
 
 test markdown-7 {Detect permission errors} -setup {

@@ -1,11 +1,11 @@
-# Copyright (C) 2019 Lawrence Woodman <lwoodman@vlifesystems.com>
+# Copyright (C) 2019-2021 Lawrence Woodman <lwoodman@vlifesystems.com>
 # Licensed under an MIT licence.  Please see LICENCE.md for details.
 
 namespace eval markdown {
   namespace export {[a-z]*}
   namespace ensemble create
 
-  variable MARKDOWN_CMD "cmark-gfm --unsafe"
+  variable MARKDOWN_CMD "cmark --unsafe"
 }
 
 proc markdown::render {text} {

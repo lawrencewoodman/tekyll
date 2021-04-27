@@ -7,8 +7,8 @@ addons:
 
 before_install:
   - pwd
-  - cp travis/cmark-gfm ~/bin/cmark-gfm
-  - chmod +x ~/bin/cmark-gfm
+  - cp travis/cmark ~/bin/cmark
+  - chmod +x ~/bin/cmark
 
 install:
   # Install tcllib
